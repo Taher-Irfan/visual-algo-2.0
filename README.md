@@ -1,141 +1,119 @@
 # VisualAlgo
 
-A premium algorithm visualization platform focused on sorting algorithms, built with React, TypeScript, and Tailwind CSS.
+Interactive, step-by-step visualizations for **sorting**, **searching**, and **graph** algorithms. Built with React, TypeScript, Vite, and Tailwind CSS.
 
-## Routes
-
-- `/sorting/bubble` - Bubble Sort visualization
-- `/sorting/selection` - Selection Sort visualization
-- `/` - Redirects to Bubble Sort
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
 
 ## Features
 
-- **Interactive Visualization**: Watch sorting algorithms execute step-by-step with beautiful bar animations
-- **Multiple Algorithms**: Currently supports Bubble Sort and Selection Sort
-- **Dual Playback Modes**:
-  - **Continuous Mode**: Auto-play with adjustable speed
-  - **Step Mode**: Manual step-by-step execution
-- **Code Highlighting**: Real-time C++ code display with line highlighting
-- **Statistics Tracking**: Live comparison and swap counts
-- **Sound Effects**: Subtle audio feedback for comparisons and swaps
-- **Dark Mode**: Seamless light/dark theme switching
-- **Responsive Design**: Premium UI inspired by modern SaaS products
+- **Sorting** — Animated bar charts with comparisons, swaps, and sorted regions
+- **Searching** — Linear and binary search with range and target highlighting
+- **Graph** — Node–edge diagrams for traversal and shortest-path style algorithms
+- **Playback** — Continuous auto-play with speed control, or manual step mode
+- **Code panel** — Reference implementation with line highlighting synced to each step
+- **Stats** — Live comparison and swap (or operation) counts where applicable
+- **Sound** — Optional subtle audio feedback (toggle in the navbar)
+- **Dark mode** — Light/dark theme with persistent preference
+- **Responsive UI** — Clean layout with Lucide icons
 
-## Tech Stack
+## Algorithms
 
-- **React 19** with TypeScript
-- **Vite** for blazing-fast development
-- **Tailwind CSS v4** with dark mode support
-- **React Router v7** for navigation
-- **Lucide React** for beautiful icons
+| Category   | Algorithms |
+|-----------|------------|
+| Sorting   | Bubble, Selection, Insertion, Quick, Merge |
+| Searching | Linear, Binary |
+| Graph     | BFS, DFS, Dijkstra, Prim |
 
-## Getting Started
+## Routes
 
-### Install Dependencies
+The app uses React Router. Default entry redirects to Bubble Sort.
+
+| Path | Description |
+|------|-------------|
+| `/` | Redirects to `/sorting/bubble` |
+| `/sorting/:algorithm` | Sorting visualizer (`bubble`, `selection`, `insertion`, `quick`, `merge`) |
+| `/searching/:algorithm` | Searching visualizer (`linear`, `binary`) |
+| `/graph/:algorithm` | Graph visualizer (`bfs`, `dfs`, `dijkstra`, `prim`) |
+
+Unknown paths fall back to `/sorting/bubble`.
+
+## Tech stack
+
+- [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite 8](https://vitejs.dev/) for dev server and production builds
+- [Tailwind CSS v4](https://tailwindcss.com/) (via PostCSS)
+- [React Router v7](https://reactrouter.com/) for routing
+- [Lucide React](https://lucide.dev/) for icons
+
+## Getting started
+
+**Requirements:** [Node.js](https://nodejs.org/) 20+ recommended (LTS).
 
 ```bash
+# Install dependencies
 npm install
-```
 
-### Development
-
-```bash
+# Start dev server (http://localhost:5173 by default)
 npm run dev
-```
 
-### Build for Production
-
-```bash
+# Production build
 npm run build
-```
 
-### Preview Production Build
-
-```bash
+# Preview production build locally
 npm run preview
+
+# Lint
+npm run lint
 ```
 
-## Project Structure
+## Project structure
 
 ```
 src/
-├── algorithms/       # Algorithm implementations
-│   ├── bubbleSort.ts
-│   ├── selectionSort.ts
-│   └── index.ts
-├── components/       # React components
-│   ├── Navbar.tsx
-│   ├── Visualizer.tsx
-│   ├── ControlPanel.tsx
-│   ├── CodePanel.tsx
-│   └── PlaybackControls.tsx
-├── hooks/           # Custom React hooks (planned)
-├── types/           # TypeScript type definitions
-│   └── index.ts
-├── utils/           # Utility functions
-│   ├── array.ts
-│   └── sound.ts
-├── App.tsx          # Main application component
-└── main.tsx         # Application entry point
+├── algorithms/          # Algorithm definitions and step generators
+│   ├── registry.ts      # Sorting + searching registry
+│   ├── graphRegistry.ts # Graph algorithms (BFS, DFS, Dijkstra, Prim)
+│   └── *.ts             # Per-algorithm modules
+├── components/          # UI (Visualizer, Navbar, ControlPanel, CodePanel, …)
+├── pages/               # Route-level pages (Sorting, Searching, Graph)
+├── hooks/               # e.g. playback, dark mode
+├── types/               # Shared TypeScript types (Step, Graph, …)
+├── utils/               # Helpers (array, graph, sound)
+├── App.tsx              # Routes
+├── main.tsx             # Entry
+└── index.css            # Global styles + Tailwind
 ```
 
-## Architecture
+## How visualization works
 
-### Step-Based Engine
+Algorithms **precompute steps** before playback:
 
-The visualizer uses a precomputed step-based approach:
+1. `generateSteps(...)` returns an ordered list of steps (array or graph state, highlights, active code line, counters, optional metadata).
+2. The UI advances the current step index in continuous or step mode.
+3. Highlights and the code panel stay in sync with the active step.
 
-1. **Step Generation**: Each algorithm implements `generateSteps(array)` which precomputes all visualization steps before playback
-2. **Step Structure**: Each step contains:
-   - Array state
-   - Active code line
-   - Element highlights (comparing, swapping, sorted)
-   - Operation counts (comparisons, swaps)
+Sorting and searching share the `Algorithm` + `Step` model; graph algorithms use `GraphAlgorithm` + `GraphStep` and a separate registry.
 
-### Adding New Algorithms
+## Extending the project
 
-To add a new sorting algorithm:
+**New sorting or searching algorithm**
 
-1. Create a new file in `src/algorithms/` (e.g., `quickSort.ts`)
-2. Implement the `Algorithm` interface:
-   ```typescript
-   export const quickSort: Algorithm = {
-     id: 'quick',
-     name: 'Quick Sort',
-     generateSteps: (array: number[]) => Step[],
-     code: '// C++ code here',
-   };
-   ```
-3. Register it in `src/algorithms/index.ts`
-4. Add it to the algorithm dropdown in `Navbar.tsx`
+1. Add `src/algorithms/yourAlgo.ts` implementing the `Algorithm` interface (`id`, `name`, `generateSteps`, `code`).
+2. Register it under `sorting` or `searching` in `src/algorithms/registry.ts`.
+3. Navigate to `/sorting/your-id` or `/searching/your-id` (IDs must match `id`).
 
-## Customization
+**New graph algorithm**
 
-### Colors
-
-Tailwind theme colors can be customized in `tailwind.config.js`:
-- Primary color scheme
-- Dark mode colors
-- Shadow styles
-
-### Speed Range
-
-Adjust playback speed in `ControlPanel.tsx`:
-```typescript
-<input type="range" min="0.5" max="4" step="0.5" />
-```
-
-### Array Size
-
-Modify array size limits in `ControlPanel.tsx`:
-```typescript
-<input type="range" min="5" max="150" />
-```
+1. Add a module implementing `GraphAlgorithm`.
+2. Register it in `src/algorithms/graphRegistry.ts`.
+3. Use `/graph/your-id`.
 
 ## Contributing
 
-This is a portfolio project demonstrating clean React architecture and modern UI/UX practices.
+Contributions, issues, and pull requests are welcome. Please keep changes focused and consistent with existing patterns.
 
 ## License
 
-MIT
+Add a `LICENSE` file in the repository root to specify terms. Until then, all rights are reserved unless you state otherwise in that file.
