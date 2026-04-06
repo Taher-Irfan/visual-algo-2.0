@@ -53,7 +53,7 @@ function Visualizer({ array, highlights }: VisualizerProps) {
   };
 
   return (
-    <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-soft p-8 flex items-end justify-center gap-1">
+    <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-soft p-3 sm:p-8 flex items-end justify-center gap-[2px] sm:gap-1 min-h-[220px]">
       {array.length === 0 ? (
         <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
           <p className="text-lg font-medium">Generate an array to begin</p>

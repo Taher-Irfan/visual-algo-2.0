@@ -1,48 +1,52 @@
 import type { Graph, GraphStep, GraphAlgorithm } from '../types';
 import { createWeightedAdjacencyList } from '../utils/graph';
 
-const primCode = `#include <iostream>
-#include <vector>
-#include <queue>
-#include <limits>
-using namespace std;
+const primCode = `void prim(graph, start):
+  inMST = {}
+  key    = {v: INF for each v}
+  parent = {v: null for each v}
+  key[start] = 0
+  pq.push(0, start)
 
-typedef pair<int, int> pii; // {weight, node}
+  while pq is not empty:
+    (w, u) = pq.pop_min()
 
-void Prim(vector<vector<pii>>& graph, int start) {
-    int n = graph.size();
-    vector<bool> inMST(n, false);
-    vector<int> key(n, INT_MAX);
-    vector<int> parent(n, -1);
-    priority_queue<pii, vector<pii>, greater<pii>> pq;
-    
-    // Start from initial node
-    key[start] = 0;
-    pq.push({0, start});
-    cout << "Starting Prim's from node " << start << endl;
-    
-    while (!pq.empty()) {
-        // Get edge with minimum weight
-        auto [weight, u] = pq.top();
-        pq.pop();
-        
-        // Skip if already in MST
-        if (inMST[u]) continue;
-        
-        inMST[u] = true;
-        cout << "Add node " << u << " to MST" << endl;
-        
-        // Explore all neighbors
-        for (auto [neighbor, edgeWeight] : graph[u]) {
-            if (!inMST[neighbor] && edgeWeight < key[neighbor]) {
-                key[neighbor] = edgeWeight;
-                parent[neighbor] = u;
-                pq.push({edgeWeight, neighbor});
-                cout << "Update edge to node " << neighbor << endl;
-            }
-        }
-    }
-}`;
+    if u in inMST: continue
+
+    inMST.add(u)
+    // add edge parent[u]→u to MST
+
+    for (v, weight) in neighbors(u):
+      if v not in inMST and weight < key[v]:
+        key[v]    = weight
+        parent[v] = u
+        pq.push(weight, v)
+
+  return MST edges via parent[]`;
+
+// Line numbers (1-indexed) for activeLine highlights:
+// 1  void prim(graph, start):
+// 2    inMST = {}
+// 3    key    = {v: INF for each v}
+// 4    parent = {v: null for each v}
+// 5    key[start] = 0
+// 6    pq.push(0, start)
+// 7  (blank)
+// 8    while pq is not empty:
+// 9      (w, u) = pq.pop_min()
+// 10   (blank)
+// 11     if u in inMST: continue
+// 12   (blank)
+// 13     inMST.add(u)
+// 14     // add edge parent[u]→u to MST
+// 15   (blank)
+// 16     for (v, weight) in neighbors(u):
+// 17       if v not in inMST and weight < key[v]:
+// 18         key[v]    = weight
+// 19         parent[v] = u
+// 20         pq.push(weight, v)
+// 21  (blank)
+// 22   return MST edges via parent[]
 
 export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] {
   const steps: GraphStep[] = [];
@@ -50,119 +54,129 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
   const inMST = new Set<string>();
   const key: Record<string, number> = {};
   const parent: Record<string, string | null> = {};
-  
+  const mstEdges: Array<{ source: string; target: string }> = [];
+
   graph.nodes.forEach(node => {
     key[node.id] = Infinity;
     parent[node.id] = null;
   });
-  
+
   key[startNode] = 0;
-  
-  const pq: Array<{node: string, weight: number}> = [{node: startNode, weight: 0}];
-  
+
+  const pq: Array<{ node: string; weight: number }> = [{ node: startNode, weight: 0 }];
+
+  // Initial step: set key[start] = 0, push to PQ
   steps.push({
     graph,
-    activeLine: 11,
-    highlights: { visiting: [], visited: [], path: [] },
-    metadata: { 
-      queue: [startNode], 
-      currentNode: undefined, 
-      startNode 
-    },
+    activeLine: 5,
+    highlights: { visiting: [startNode], visited: [], path: [], mstEdges: [] },
+    metadata: { queue: [startNode], currentNode: startNode, startNode },
   });
-  
-  steps.push({
-    graph,
-    activeLine: 15,
-    highlights: { visiting: [startNode], visited: [], path: [] },
-    metadata: { 
-      queue: [startNode], 
-      currentNode: startNode, 
-      startNode 
-    },
-  });
-  
+
   while (pq.length > 0) {
     pq.sort((a, b) => a.weight - b.weight);
-    const {node: current} = pq.shift()!;
-    
-    if (inMST.has(current)) continue;
-    
-    inMST.add(current);
-    
+    const { node: current } = pq.shift()!;
+
+    // Step: pop min from PQ
     steps.push({
       graph,
-      activeLine: 25,
-      highlights: { 
-        visiting: [current], 
-        visited: Array.from(inMST).filter(n => n !== current), 
-        path: Array.from(inMST)
+      activeLine: 9,
+      highlights: {
+        visiting: [current],
+        visited: Array.from(inMST),
+        path: Array.from(inMST),
+        mstEdges: mstEdges.map(e => ({ ...e })),
       },
-      metadata: { 
-        queue: pq.map(p => p.node), 
-        currentNode: current, 
-        startNode 
-      },
+      metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
     });
-    
+
+    if (inMST.has(current)) {
+      // Step: skip — already in MST
+      steps.push({
+        graph,
+        activeLine: 11,
+        highlights: {
+          visiting: [],
+          visited: Array.from(inMST),
+          path: Array.from(inMST),
+          mstEdges: mstEdges.map(e => ({ ...e })),
+        },
+        metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+      });
+      continue;
+    }
+
+    // Add current node to MST
+    inMST.add(current);
+    if (parent[current] !== null) {
+      mstEdges.push({ source: parent[current]!, target: current });
+    }
+
+    // Step: inMST.add(u), add MST edge
+    steps.push({
+      graph,
+      activeLine: 13,
+      highlights: {
+        visiting: [current],
+        visited: Array.from(inMST).filter(n => n !== current),
+        path: Array.from(inMST),
+        mstEdges: mstEdges.map(e => ({ ...e })),
+      },
+      metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+    });
+
     const neighbors = adjacencyList.get(current) || [];
-    
-    for (const {node: neighbor, weight} of neighbors) {
-      if (!inMST.has(neighbor)) {
+
+    for (const { node: neighbor, weight } of neighbors) {
+      if (inMST.has(neighbor)) continue;
+
+      // Step: checking neighbor
+      steps.push({
+        graph,
+        activeLine: 17,
+        highlights: {
+          visiting: [current, neighbor],
+          visited: Array.from(inMST),
+          path: Array.from(inMST),
+          mstEdges: mstEdges.map(e => ({ ...e })),
+        },
+        metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+      });
+
+      if (weight < key[neighbor]) {
+        key[neighbor] = weight;
+        parent[neighbor] = current;
+        pq.push({ node: neighbor, weight });
+
+        // Step: update key and push to PQ
         steps.push({
           graph,
-          activeLine: 30,
-          highlights: { 
-            visiting: [current, neighbor], 
-            visited: Array.from(inMST), 
-            path: Array.from(inMST)
+          activeLine: 20,
+          highlights: {
+            visiting: [neighbor],
+            visited: Array.from(inMST),
+            path: Array.from(inMST),
+            mstEdges: mstEdges.map(e => ({ ...e })),
           },
-          metadata: { 
-            queue: pq.map(p => p.node), 
-            currentNode: current, 
-            startNode 
-          },
+          metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
         });
-        
-        if (weight < key[neighbor]) {
-          key[neighbor] = weight;
-          parent[neighbor] = current;
-          pq.push({node: neighbor, weight});
-          
-          steps.push({
-            graph,
-            activeLine: 33,
-            highlights: { 
-              visiting: [neighbor], 
-              visited: Array.from(inMST), 
-              path: Array.from(inMST)
-            },
-            metadata: { 
-              queue: pq.map(p => p.node), 
-              currentNode: current, 
-              startNode 
-            },
-          });
-        }
       }
     }
   }
-  
+
+  // Final step: MST complete
   steps.push({
     graph,
-    activeLine: 37,
-    highlights: { 
-      visiting: [], 
-      visited: Array.from(inMST), 
-      path: Array.from(inMST)
+    activeLine: 22,
+    highlights: {
+      visiting: [],
+      visited: Array.from(inMST),
+      path: Array.from(inMST),
+      mstEdges: mstEdges.map(e => ({ ...e })),
     },
-    metadata: { 
-      queue: [], 
-      currentNode: undefined, 
-      startNode 
-    },
+    metadata: { queue: [], currentNode: undefined, startNode },
   });
-  
+
   return steps;
 }
 

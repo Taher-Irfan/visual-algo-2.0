@@ -27,7 +27,7 @@ export default function CodePanel({ code, activeLine }: CodePanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-6 h-full flex flex-col overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -37,11 +37,11 @@ export default function CodePanel({ code, activeLine }: CodePanelProps) {
           C++
         </span>
       </div>
-      
-      {/* Code Container */}
+
+      {/* Code Container — fixed height so it's always visible regardless of parent layout */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-auto scrollbar-thin bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+        className="h-[260px] sm:h-[340px] overflow-auto scrollbar-thin bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
       >
         <pre className="text-sm font-mono leading-relaxed p-4">
           {lines.map((line, index) => {

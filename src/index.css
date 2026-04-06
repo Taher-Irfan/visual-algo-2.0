@@ -19,8 +19,8 @@
 @variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  body {
-    @apply antialiased;
+  html, body {
+    @apply antialiased bg-gray-50 dark:bg-gray-950;
   }
 }
 

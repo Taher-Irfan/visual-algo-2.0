@@ -76,16 +76,16 @@ function SearchingVisualizer({ array, highlights, metadata }: SearchingVisualize
   const hasTarget = metadata?.target !== undefined;
 
   return (
-    <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-soft p-8 flex flex-col">
+    <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-soft p-3 sm:p-8 flex flex-col min-h-[220px]">
       {/* Search Info Header */}
       {hasTarget && (
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="mb-3 sm:mb-6 flex flex-wrap items-center gap-2 sm:gap-0 sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2 sm:space-x-4">
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 Target:
               </span>
-              <span className="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg font-bold text-lg">
+              <span className="px-2 py-0.5 sm:px-3 sm:py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-lg font-bold text-base sm:text-lg">
                 {metadata.target}
               </span>
             </div>
@@ -95,7 +95,7 @@ function SearchingVisualizer({ array, highlights, metadata }: SearchingVisualize
                   Status:
                 </span>
                 <span
-                  className={`px-3 py-1 rounded-lg font-semibold text-sm ${
+                  className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg font-semibold text-xs sm:text-sm ${
                     metadata.found
                       ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
@@ -168,7 +168,7 @@ function SearchingVisualizer({ array, highlights, metadata }: SearchingVisualize
       </div>
 
       {/* Legend */}
-      <div className="mt-6 flex items-center justify-center space-x-6 text-sm">
+      <div className="mt-3 sm:mt-6 flex items-center justify-center flex-wrap gap-3 sm:space-x-6 text-sm">
         <div className="flex items-center space-x-2">
           <div className="w-4 h-4 bg-yellow-400 dark:bg-yellow-500 rounded border-2 border-yellow-500" />
           <span className="text-gray-600 dark:text-gray-400">Current</span>

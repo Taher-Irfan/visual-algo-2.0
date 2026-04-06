@@ -117,17 +117,17 @@ function SearchingPage() {
         onSoundToggle={() => setIsSoundEnabled(!isSoundEnabled)}
       />
 
-      <main className="max-w-screen-2xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
+      <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:h-[calc(100vh-140px)]">
           {/* Left Panel - Visualizer (2/3 width on large screens) */}
-          <div className="lg:col-span-2 flex flex-col space-y-6">
+          <div className="lg:col-span-2 flex flex-col space-y-4 sm:space-y-6">
             <SearchingVisualizer
               array={currentStep.array}
               highlights={currentStep.highlights}
               metadata={currentStep.metadata}
             />
-            
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-6">
+
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6">
               <PlaybackControls
                 playbackStatus={playbackStatus}
                 playbackMode={playbackMode}
@@ -144,7 +144,7 @@ function SearchingPage() {
           </div>
 
           {/* Right Panel - Controls + Code (1/3 width on large screens) */}
-          <div className="flex flex-col space-y-6">
+          <div className="flex flex-col space-y-4 sm:space-y-6">
             <ControlPanel
               arraySize={arraySize}
               speed={speed}
@@ -154,7 +154,7 @@ function SearchingPage() {
               onGenerateArray={handleGenerateArray}
               isPlaying={playbackStatus === 'playing'}
             />
-            
+
             <CodePanel
               code={algorithm.code}
               activeLine={currentStep.activeLine}

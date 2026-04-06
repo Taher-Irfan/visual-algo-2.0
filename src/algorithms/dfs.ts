@@ -1,151 +1,131 @@
 import type { Graph, GraphStep, GraphAlgorithm } from '../types';
 import { createAdjacencyList } from '../utils/graph';
 
-const dfsCode = `#include <iostream>
-#include <vector>
-#include <stack>
-using namespace std;
+const dfsCode = `void DFS(graph, node, visited[]) {
+    visited[node] = true
+    print "Visit " + node
 
-void DFS(vector<vector<int>>& graph, int start) {
-    int n = graph.size();
-    vector<bool> visited(n, false);
-    stack<int> s;
-    
-    // Start from the initial node
-    s.push(start);
-    cout << "Starting DFS from node " << start << endl;
-    
-    while (!s.empty()) {
-        // Pop a node from stack
-        int current = s.top();
-        s.pop();
-        
-        if (!visited[current]) {
-            visited[current] = true;
-            cout << "Visit node " << current << endl;
-            
-            // Push all neighbors to stack
-            for (int neighbor : graph[current]) {
-                if (!visited[neighbor]) {
-                    s.push(neighbor);
-                    cout << "Push node " << neighbor << endl;
-                }
-            }
-        }
+    for neighbor in graph[node]:
+        if not visited[neighbor]:
+            DFS(graph, neighbor, visited)
+}
+
+void main():
+    visited = [false, ..., false]
+    DFS(graph, start, visited)`;
+
+function dfsHelper(
+  node: string,
+  graph: Graph,
+  adjacencyList: Map<string, string[]>,
+  visited: Set<string>,
+  callStack: string[],
+  steps: GraphStep[],
+  startNode: string
+) {
+  callStack.push(node);
+
+  // Line 1: visited[node] = true
+  steps.push({
+    graph,
+    activeLine: 1,
+    highlights: { visiting: [node], visited: Array.from(visited), path: [] },
+    metadata: { stack: [...callStack], currentNode: node, startNode },
+  });
+
+  visited.add(node);
+
+  // Line 2: print "Visit " + node
+  steps.push({
+    graph,
+    activeLine: 2,
+    highlights: { visiting: [node], visited: Array.from(visited), path: [] },
+    metadata: { stack: [...callStack], currentNode: node, startNode },
+  });
+
+  const neighbors = adjacencyList.get(node) || [];
+
+  for (const neighbor of neighbors) {
+    // Line 4: for neighbor in graph[node]
+    steps.push({
+      graph,
+      activeLine: 4,
+      highlights: { visiting: [node, neighbor], visited: Array.from(visited), path: [] },
+      metadata: { stack: [...callStack], currentNode: node, startNode },
+    });
+
+    // Line 5: if not visited[neighbor]
+    steps.push({
+      graph,
+      activeLine: 5,
+      highlights: { visiting: [node, neighbor], visited: Array.from(visited), path: [] },
+      metadata: { stack: [...callStack], currentNode: node, startNode },
+    });
+
+    if (!visited.has(neighbor)) {
+      // Line 6: DFS(graph, neighbor, visited) — entering recursive call
+      steps.push({
+        graph,
+        activeLine: 6,
+        highlights: { visiting: [neighbor], visited: Array.from(visited), path: [] },
+        metadata: { stack: [...callStack, neighbor], currentNode: neighbor, startNode },
+      });
+
+      dfsHelper(neighbor, graph, adjacencyList, visited, callStack, steps, startNode);
     }
-}`;
+  }
+
+  // Line 7: closing brace — backtrack, return to caller
+  callStack.pop();
+
+  steps.push({
+    graph,
+    activeLine: 7,
+    highlights: {
+      visiting: callStack.length > 0 ? [callStack[callStack.length - 1]] : [],
+      visited: Array.from(visited),
+      path: [],
+    },
+    metadata: {
+      stack: [...callStack],
+      currentNode: callStack.length > 0 ? callStack[callStack.length - 1] : undefined,
+      startNode,
+    },
+  });
+}
 
 export function generateDFSSteps(graph: Graph, startNode: string): GraphStep[] {
   const steps: GraphStep[] = [];
   const adjacencyList = createAdjacencyList(graph);
   const visited = new Set<string>();
-  const stack: string[] = [];
+  const callStack: string[] = [];
 
+  // Line 10: visited = [false, ..., false]
   steps.push({
     graph,
-    activeLine: 9,
+    activeLine: 10,
     highlights: { visiting: [], visited: [], path: [] },
     metadata: { stack: [], currentNode: undefined, startNode },
   });
 
-  stack.push(startNode);
-
+  // Line 11: DFS(graph, start, visited)
   steps.push({
     graph,
-    activeLine: 14,
+    activeLine: 11,
     highlights: { visiting: [startNode], visited: [], path: [] },
     metadata: { stack: [startNode], currentNode: startNode, startNode },
   });
 
-  while (stack.length > 0) {
-    steps.push({
-      graph,
-      activeLine: 17,
-      highlights: { 
-        visiting: [stack[stack.length - 1]], 
-        visited: Array.from(visited), 
-        path: [] 
-      },
-      metadata: { stack: [...stack], currentNode: stack[stack.length - 1], startNode },
-    });
+  dfsHelper(startNode, graph, adjacencyList, visited, callStack, steps, startNode);
 
-    const current = stack.pop()!;
-
-    steps.push({
-      graph,
-      activeLine: 20,
-      highlights: { 
-        visiting: [current], 
-        visited: Array.from(visited), 
-        path: [] 
-      },
-      metadata: { stack: [...stack], currentNode: current, startNode },
-    });
-
-    if (!visited.has(current)) {
-      visited.add(current);
-
-      steps.push({
-        graph,
-        activeLine: 23,
-        highlights: { 
-          visiting: [current], 
-          visited: Array.from(visited), 
-          path: [] 
-        },
-        metadata: { stack: [...stack], currentNode: current, startNode },
-      });
-
-      const neighbors = adjacencyList.get(current) || [];
-
-      for (const neighbor of neighbors) {
-        steps.push({
-          graph,
-          activeLine: 26,
-          highlights: { 
-            visiting: [current, neighbor], 
-            visited: Array.from(visited), 
-            path: [] 
-          },
-          metadata: { stack: [...stack], currentNode: current, startNode },
-        });
-
-        if (!visited.has(neighbor)) {
-          stack.push(neighbor);
-
-          steps.push({
-            graph,
-            activeLine: 28,
-            highlights: { 
-              visiting: [neighbor], 
-              visited: Array.from(visited), 
-              path: [] 
-            },
-            metadata: { stack: [...stack], currentNode: current, startNode },
-          });
-        }
-      }
-    }
-
-    steps.push({
-      graph,
-      activeLine: 32,
-      highlights: { 
-        visiting: [], 
-        visited: Array.from(visited), 
-        path: [] 
-      },
-      metadata: { stack: [...stack], currentNode: undefined, startNode },
-    });
-  }
-
+  // Final: all nodes explored — highlight in green
   steps.push({
     graph,
-    activeLine: 33,
-    highlights: { 
-      visiting: [], 
-      visited: Array.from(visited), 
-      path: Array.from(visited) 
+    activeLine: 11,
+    highlights: {
+      visiting: [],
+      visited: Array.from(visited),
+      path: Array.from(visited),
     },
     metadata: { stack: [], currentNode: undefined, startNode },
   });

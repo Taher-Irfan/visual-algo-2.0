@@ -56,6 +56,7 @@ export type GraphStep = {
     visiting?: string[];
     visited?: string[];
     path?: string[];
+    mstEdges?: Array<{ source: string; target: string }>;
   };
   metadata?: {
     queue?: string[];
@@ -64,6 +65,7 @@ export type GraphStep = {
     startNode?: string;
     distances?: Record<string, number>;
     previous?: Record<string, string | null>;
+    levels?: Record<string, number>;
   };
 };
 

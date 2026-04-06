@@ -22,7 +22,7 @@ export default function ControlPanel({
   isPlaying,
 }: ControlPanelProps) {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-6 space-y-6">
+    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6 space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Controls

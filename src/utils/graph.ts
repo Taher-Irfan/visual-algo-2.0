@@ -11,19 +11,26 @@ export function generateGraph(nodeCount: number, layout: GraphLayoutType): Graph
 
 function generateNodes(nodeCount: number, layout: GraphLayoutType) {
   const nodes = [];
-  
+  // Minimum spacing between node centres so they never crowd together
+  const MIN_H_SPACING = 75;
+  const LEVEL_HEIGHT = 95;
+  const CELL = 95; // grid cell size
+  const MESH_CELL = 130; // mesh cell size (larger to avoid label overlap)
+  const MARGIN = 60;
+
   switch (layout) {
     case 'tree': {
       const levels = Math.ceil(Math.log2(nodeCount + 1));
-      const width = 400;
-      const height = 500;
+      // Width grows with the widest possible level
+      const maxNodesAtLastLevel = Math.pow(2, levels - 1);
+      const totalWidth = Math.max(400, maxNodesAtLastLevel * MIN_H_SPACING + 80);
       let nodeIndex = 0;
-      
+
       for (let level = 0; level < levels && nodeIndex < nodeCount; level++) {
         const nodesInLevel = Math.min(Math.pow(2, level), nodeCount - nodeIndex);
-        const spacing = width / (nodesInLevel + 1);
-        const y = (height / (levels + 1)) * (level + 1);
-        
+        const spacing = totalWidth / (nodesInLevel + 1);
+        const y = MARGIN + level * LEVEL_HEIGHT;
+
         for (let i = 0; i < nodesInLevel && nodeIndex < nodeCount; i++, nodeIndex++) {
           nodes.push({
             id: String(nodeIndex),
@@ -33,12 +40,13 @@ function generateNodes(nodeCount: number, layout: GraphLayoutType) {
       }
       break;
     }
-    
+
     case 'circular': {
-      const centerX = 200;
-      const centerY = 250;
-      const radius = 150;
-      
+      // Radius grows with node count so nodes stay comfortable
+      const radius = Math.max(150, nodeCount * 20);
+      const centerX = radius + MARGIN;
+      const centerY = radius + MARGIN;
+
       for (let i = 0; i < nodeCount; i++) {
         const angle = (2 * Math.PI * i) / nodeCount - Math.PI / 2;
         nodes.push({
@@ -51,48 +59,42 @@ function generateNodes(nodeCount: number, layout: GraphLayoutType) {
       }
       break;
     }
-    
+
     case 'grid': {
       const cols = Math.ceil(Math.sqrt(nodeCount));
-      const rows = Math.ceil(nodeCount / cols);
-      const spacing = 350 / (cols + 1);
-      const verticalSpacing = 450 / (rows + 1);
-      
+
       for (let i = 0; i < nodeCount; i++) {
         const row = Math.floor(i / cols);
         const col = i % cols;
         nodes.push({
           id: String(i),
           position: {
-            x: 50 + spacing * (col + 1),
-            y: 50 + verticalSpacing * (row + 1)
+            x: MARGIN + col * CELL,
+            y: MARGIN + row * CELL
           }
         });
       }
       break;
     }
-    
+
     case 'mesh': {
       const cols = Math.ceil(Math.sqrt(nodeCount));
-      const rows = Math.ceil(nodeCount / cols);
-      const spacing = 300 / (cols + 1);
-      const verticalSpacing = 400 / (rows + 1);
-      
+
       for (let i = 0; i < nodeCount; i++) {
         const row = Math.floor(i / cols);
         const col = i % cols;
         nodes.push({
           id: String(i),
           position: {
-            x: 100 + spacing * col,
-            y: 100 + verticalSpacing * row
+            x: MARGIN + col * MESH_CELL,
+            y: MARGIN + row * MESH_CELL
           }
         });
       }
       break;
     }
   }
-  
+
   return nodes;
 }
 

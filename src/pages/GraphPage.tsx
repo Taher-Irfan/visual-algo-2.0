@@ -210,6 +210,20 @@ function GraphPage() {
     return <div>Algorithm not found</div>;
   }
 
+  // Node labels: BFS shows level, Dijkstra shows cost from source
+  const nodeLabels: Record<string, number> | undefined = (() => {
+    if (selectedAlgorithm === 'bfs' && currentStep.metadata?.levels) {
+      return currentStep.metadata.levels;
+    }
+    if (selectedAlgorithm === 'dijkstra' && currentStep.metadata?.distances) {
+      return currentStep.metadata.distances;
+    }
+    return undefined;
+  })();
+
+  // DFS and BFS don't need edge weights displayed
+  const showEdgeWeights = selectedAlgorithm !== 'dfs' && selectedAlgorithm !== 'bfs';
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
       <Navbar
@@ -223,15 +237,17 @@ function GraphPage() {
         onSoundToggle={() => setIsSoundEnabled(!isSoundEnabled)}
       />
 
-      <main className="max-w-screen-2xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
-          <div className="lg:col-span-2 flex flex-col space-y-6">
+      <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:h-[calc(100vh-140px)]">
+          <div className="lg:col-span-2 flex flex-col space-y-4 sm:space-y-6 lg:min-h-0 lg:overflow-y-auto">
             <GraphVisualizer
               graph={currentStep.graph}
               highlights={currentStep.highlights}
+              nodeLabels={nodeLabels}
+              showEdgeWeights={showEdgeWeights}
             />
-            
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-6">
+
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6">
               <PlaybackControls
                 playbackStatus={playbackStatus}
                 playbackMode={playbackMode}
@@ -247,8 +263,8 @@ function GraphPage() {
             </div>
           </div>
 
-          <div className="flex flex-col space-y-6">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-6 space-y-6">
+          <div className="flex flex-col space-y-4 sm:space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6 space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Controls
@@ -352,7 +368,7 @@ function GraphPage() {
                     {currentStep.metadata.stack && (
                       <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <span className="text-sm text-gray-600 dark:text-gray-400 block mb-1">
-                          Stack
+                          {selectedAlgorithm === 'dfs' ? 'Call Stack' : 'Stack'}
                         </span>
                         <span className="text-sm font-mono font-bold text-gray-900 dark:text-white">
                           [{currentStep.metadata.stack.join(', ')}]

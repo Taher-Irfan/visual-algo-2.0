@@ -1,12 +1,7 @@
 import type { Graph, GraphStep, GraphAlgorithm } from '../types';
 import { createAdjacencyList } from '../utils/graph';
 
-const bfsCode = `#include <iostream>
-#include <vector>
-#include <queue>
-using namespace std;
-
-void BFS(vector<vector<int>>& graph, int start) {
+const bfsCode = `void BFS(vector<vector<int>>& graph, int start) {
     int n = graph.size();
     vector<bool> visited(n, false);
     queue<int> q;
@@ -38,101 +33,104 @@ export function generateBFSSteps(graph: Graph, startNode: string): GraphStep[] {
   const adjacencyList = createAdjacencyList(graph);
   const visited = new Set<string>();
   const queue: string[] = [];
+  const levels: Record<string, number> = {};
 
   steps.push({
     graph,
-    activeLine: 7,
+    activeLine: 2,
     highlights: { visiting: [], visited: [], path: [] },
-    metadata: { queue: [], currentNode: undefined, startNode },
+    metadata: { queue: [], currentNode: undefined, startNode, levels: {} },
   });
 
   visited.add(startNode);
   queue.push(startNode);
+  levels[startNode] = 0;
 
   steps.push({
     graph,
-    activeLine: 13,
+    activeLine: 8,
     highlights: { visiting: [startNode], visited: [], path: [] },
-    metadata: { queue: [startNode], currentNode: startNode, startNode },
+    metadata: { queue: [startNode], currentNode: startNode, startNode, levels: { ...levels } },
   });
 
   while (queue.length > 0) {
     steps.push({
       graph,
-      activeLine: 17,
-      highlights: { 
-        visiting: [queue[0]], 
-        visited: Array.from(visited).filter(n => n !== queue[0]), 
-        path: [] 
+      activeLine: 12,
+      highlights: {
+        visiting: [queue[0]],
+        visited: Array.from(visited).filter(n => n !== queue[0]),
+        path: []
       },
-      metadata: { queue: [...queue], currentNode: queue[0], startNode },
+      metadata: { queue: [...queue], currentNode: queue[0], startNode, levels: { ...levels } },
     });
 
     const current = queue.shift()!;
 
     steps.push({
       graph,
-      activeLine: 20,
-      highlights: { 
-        visiting: [current], 
-        visited: Array.from(visited).filter(n => n !== current), 
-        path: [] 
+      activeLine: 15,
+      highlights: {
+        visiting: [current],
+        visited: Array.from(visited).filter(n => n !== current),
+        path: []
       },
-      metadata: { queue: [...queue], currentNode: current, startNode },
+      metadata: { queue: [...queue], currentNode: current, startNode, levels: { ...levels } },
     });
 
     const neighbors = adjacencyList.get(current) || [];
-    
+
     for (const neighbor of neighbors) {
       steps.push({
         graph,
-        activeLine: 23,
-        highlights: { 
-          visiting: [current, neighbor], 
-          visited: Array.from(visited), 
-          path: [] 
+        activeLine: 18,
+        highlights: {
+          visiting: [current, neighbor],
+          visited: Array.from(visited),
+          path: []
         },
-        metadata: { queue: [...queue], currentNode: current, startNode },
+        metadata: { queue: [...queue], currentNode: current, startNode, levels: { ...levels } },
       });
 
       if (!visited.has(neighbor)) {
         visited.add(neighbor);
         queue.push(neighbor);
+        levels[neighbor] = levels[current] + 1;
 
         steps.push({
           graph,
-          activeLine: 25,
-          highlights: { 
-            visiting: [neighbor], 
-            visited: Array.from(visited).filter(n => n !== neighbor), 
-            path: [] 
+          activeLine: 20,
+          highlights: {
+            visiting: [neighbor],
+            visited: Array.from(visited).filter(n => n !== neighbor),
+            path: []
           },
-          metadata: { queue: [...queue], currentNode: current, startNode },
+          metadata: { queue: [...queue], currentNode: current, startNode, levels: { ...levels } },
         });
       }
     }
 
     steps.push({
       graph,
-      activeLine: 29,
-      highlights: { 
-        visiting: [], 
-        visited: Array.from(visited), 
-        path: [] 
+      activeLine: 24,
+      highlights: {
+        visiting: [],
+        visited: Array.from(visited),
+        path: []
       },
-      metadata: { queue: [...queue], currentNode: undefined, startNode },
+      metadata: { queue: [...queue], currentNode: undefined, startNode, levels: { ...levels } },
     });
   }
 
   steps.push({
     graph,
-    activeLine: 30,
-    highlights: { 
-      visiting: [], 
-      visited: Array.from(visited), 
-      path: Array.from(visited) 
+    activeLine: 25,
+    highlights: {
+      visiting: [],
+      visited: Array.from(visited),
+      path: Array.from(visited)
     },
-    metadata: { queue: [], currentNode: undefined, startNode },
+    metadata: { queue: [], currentNode: undefined, startNode, levels: { ...levels } },
   });
 
   return steps;

@@ -1,13 +1,7 @@
 import type { Graph, GraphStep, GraphAlgorithm } from '../types';
 import { createWeightedAdjacencyList } from '../utils/graph';
 
-const dijkstraCode = `#include <iostream>
-#include <vector>
-#include <queue>
-#include <limits>
-using namespace std;
-
-typedef pair<int, int> pii; // {distance, node}
+const dijkstraCode = `typedef pair<int, int> pii; // {distance, node}
 
 void Dijkstra(vector<vector<pii>>& graph, int start) {
     int n = graph.size();
@@ -63,7 +57,7 @@ export function generateDijkstraSteps(graph: Graph, startNode: string): GraphSte
   
   steps.push({
     graph,
-    activeLine: 11,
+    activeLine: 5,
     highlights: { visiting: [], visited: [], path: [] },
     metadata: { 
       queue: [startNode], 
@@ -76,7 +70,7 @@ export function generateDijkstraSteps(graph: Graph, startNode: string): GraphSte
   
   steps.push({
     graph,
-    activeLine: 15,
+    activeLine: 9,
     highlights: { visiting: [startNode], visited: [], path: [] },
     metadata: { 
       queue: [startNode], 
@@ -98,7 +92,7 @@ export function generateDijkstraSteps(graph: Graph, startNode: string): GraphSte
     
     steps.push({
       graph,
-      activeLine: 20,
+      activeLine: 14,
       highlights: { 
         visiting: [current], 
         visited: Array.from(visited).filter(n => n !== current), 
@@ -118,7 +112,7 @@ export function generateDijkstraSteps(graph: Graph, startNode: string): GraphSte
     for (const {node: neighbor, weight} of neighbors) {
       steps.push({
         graph,
-        activeLine: 29,
+        activeLine: 23,
         highlights: { 
           visiting: [current, neighbor], 
           visited: Array.from(visited), 
@@ -142,7 +136,7 @@ export function generateDijkstraSteps(graph: Graph, startNode: string): GraphSte
         
         steps.push({
           graph,
-          activeLine: 33,
+          activeLine: 27,
           highlights: { 
             visiting: [neighbor], 
             visited: Array.from(visited), 
@@ -169,7 +163,7 @@ export function generateDijkstraSteps(graph: Graph, startNode: string): GraphSte
   
   steps.push({
     graph,
-    activeLine: 38,
+    activeLine: 32,
     highlights: { 
       visiting: [], 
       visited: Array.from(visited), 
