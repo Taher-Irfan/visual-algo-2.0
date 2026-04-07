@@ -8,7 +8,7 @@ import { getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms/regis
 import { getGraphAlgorithm, getDefaultGraphAlgorithm } from '../algorithms/graphRegistry';
 import { generateGraph, type GraphLayoutType } from '../utils/graph';
 import { soundEngine } from '../utils/sound';
-import { useDarkMode } from '../hooks';
+import { useDarkMode, useSound } from '../hooks';
 import type { GraphStep, Graph } from '../types';
 
 interface GraphPlaybackController {
@@ -116,7 +116,7 @@ function GraphPage() {
   const [selectedAlgorithm, setSelectedAlgorithm] = useState(algorithmParam || 'bfs');
   const [steps, setSteps] = useState<GraphStep[]>([]);
   const [isDarkMode, setIsDarkMode] = useDarkMode();
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isSoundEnabled, setIsSoundEnabled] = useSound();
   const [startNode, setStartNode] = useState('0');
   const [graphLayout, setGraphLayout] = useState<GraphLayoutType>('tree');
   const [nodeCount, setNodeCount] = useState(7);
@@ -148,10 +148,6 @@ function GraphPage() {
   useEffect(() => {
     soundEngine.initialize();
   }, []);
-
-  useEffect(() => {
-    soundEngine.setEnabled(isSoundEnabled);
-  }, [isSoundEnabled]);
 
   useEffect(() => {
     const newGraph = generateGraph(nodeCount, graphLayout);
@@ -196,6 +192,8 @@ function GraphPage() {
     } else if (newCategory === 'graph') {
       const graphDefaultAlgo = getDefaultGraphAlgorithm();
       navigate(`/graph/${graphDefaultAlgo}`);
+    } else if (newCategory === 'tree') {
+      navigate('/tree/segment');
     }
   };
 
@@ -225,7 +223,7 @@ function GraphPage() {
   const showEdgeWeights = selectedAlgorithm !== 'dfs' && selectedAlgorithm !== 'bfs';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 transition-colors">
       <Navbar
         category={category}
         selectedAlgorithm={selectedAlgorithm}
@@ -247,7 +245,7 @@ function GraphPage() {
               showEdgeWeights={showEdgeWeights}
             />
 
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft p-5 sm:p-6">
               <PlaybackControls
                 playbackStatus={playbackStatus}
                 playbackMode={playbackMode}
@@ -264,20 +262,20 @@ function GraphPage() {
           </div>
 
           <div className="flex flex-col space-y-4 sm:space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6 space-y-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft p-5 sm:p-6 space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-4">
                   Controls
                 </h3>
 
-                <div className="space-y-6">
+                <div className="space-y-5">
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
                         Speed
                       </label>
-                      <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
-                        {speed}x
+                      <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 tabular-nums">
+                        {speed}×
                       </span>
                     </div>
                     <input
@@ -287,16 +285,16 @@ function GraphPage() {
                       step="0.5"
                       value={speed}
                       onChange={(e) => setSpeed(Number(e.target.value))}
-                      className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                      className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500"
                     />
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
                         Number of Nodes
                       </label>
-                      <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                      <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 tabular-nums">
                         {nodeCount}
                       </span>
                     </div>
@@ -308,19 +306,19 @@ function GraphPage() {
                       value={nodeCount}
                       onChange={(e) => setNodeCount(Number(e.target.value))}
                       disabled={playbackStatus === 'playing'}
-                      className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary-500 disabled:opacity-50"
+                      className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
                     />
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 block">
                       Graph Layout
                     </label>
                     <select
                       value={graphLayout}
                       onChange={(e) => setGraphLayout(e.target.value as GraphLayoutType)}
                       disabled={playbackStatus === 'playing'}
-                      className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
+                      className="w-full px-3 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40 cursor-pointer"
                     >
                       <option value="tree">Tree</option>
                       <option value="circular">Circular</option>
@@ -330,14 +328,14 @@ function GraphPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                    <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2 block">
                       Start Node
                     </label>
                     <select
                       value={startNode}
                       onChange={(e) => setStartNode(e.target.value)}
                       disabled={playbackStatus === 'playing'}
-                      className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
+                      className="w-full px-3 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40 cursor-pointer"
                     >
                       {currentGraph.nodes.map(node => (
                         <option key={node.id} value={node.id}>
@@ -350,51 +348,151 @@ function GraphPage() {
               </div>
 
               {currentStep.metadata && (
-                <div className="pt-6 border-t border-gray-200 dark:border-gray-800">
-                  <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                <div className="pt-5 border-t border-slate-100 dark:border-slate-800">
+                  <h4 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
                     Algorithm State
                   </h4>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {currentStep.metadata.queue && (
-                      <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 block mb-1">
-                          Queue
-                        </span>
-                        <span className="text-sm font-mono font-bold text-gray-900 dark:text-white">
-                          [{currentStep.metadata.queue.join(', ')}]
-                        </span>
-                      </div>
-                    )}
-                    {currentStep.metadata.stack && (
-                      <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 block mb-1">
-                          {selectedAlgorithm === 'dfs' ? 'Call Stack' : 'Stack'}
-                        </span>
-                        <span className="text-sm font-mono font-bold text-gray-900 dark:text-white">
-                          [{currentStep.metadata.stack.join(', ')}]
-                        </span>
-                      </div>
-                    )}
+                  <div className="space-y-2 max-h-96 overflow-y-auto scrollbar-thin">
+                    {/* Current Node */}
                     {currentStep.metadata.currentNode !== undefined && (
-                      <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 block mb-1">
-                          Current Node
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Current</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.metadata.currentNode !== undefined ? `Node ${currentStep.metadata.currentNode}` : '—'}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Visited</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.highlights.visited?.length ?? 0} / {currentStep.graph.nodes.length}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* BFS: Level of current node */}
+                    {selectedAlgorithm === 'bfs' && currentStep.metadata.levels && currentStep.metadata.currentNode !== undefined && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Level</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.metadata.levels[currentStep.metadata.currentNode] ?? '—'}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Queue Size</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.metadata.queue?.length ?? 0}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* DFS: Stack depth */}
+                    {selectedAlgorithm === 'dfs' && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Depth</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.metadata.stack?.length ?? 0}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Start</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            Node {currentStep.metadata.startNode}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Queue (BFS / Dijkstra / Prim) */}
+                    {currentStep.metadata.queue && selectedAlgorithm !== 'dfs' && (
+                      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1 uppercase tracking-wide">
+                          Priority Queue
                         </span>
-                        <span className="text-sm font-mono font-bold text-gray-900 dark:text-white">
-                          {currentStep.metadata.currentNode || 'None'}
+                        <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                          {currentStep.metadata.queue.length > 0 ? `[${currentStep.metadata.queue.join(', ')}]` : '(empty)'}
                         </span>
                       </div>
                     )}
-                    {currentStep.metadata.distances && (
-                      <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 block mb-1">
-                          Distances
+
+                    {/* Call Stack (DFS) */}
+                    {currentStep.metadata.stack && selectedAlgorithm === 'dfs' && (
+                      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1 uppercase tracking-wide">
+                          Call Stack
                         </span>
-                        <div className="text-sm font-mono text-gray-900 dark:text-white">
+                        <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                          {currentStep.metadata.stack.length > 0 ? `[${currentStep.metadata.stack.join(' → ')}]` : '(empty)'}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Dijkstra: Current node distance + parent */}
+                    {selectedAlgorithm === 'dijkstra' && currentStep.metadata.currentNode !== undefined && currentStep.metadata.distances && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Dist(cur)</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {(() => { const d = currentStep.metadata!.distances![currentStep.metadata!.currentNode!]; return d === Infinity ? '∞' : d; })()}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Parent</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.metadata.previous?.[currentStep.metadata.currentNode] ?? '—'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Dijkstra: Full distances table */}
+                    {currentStep.metadata.distances && (
+                      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1.5 uppercase tracking-wide">
+                          Distances from {currentStep.metadata.startNode}
+                        </span>
+                        <div className="text-xs font-mono text-slate-900 dark:text-white space-y-0.5">
                           {Object.entries(currentStep.metadata.distances).map(([node, dist]) => (
                             <div key={node} className="flex justify-between">
-                              <span>Node {node}:</span>
+                              <span className="text-slate-500 dark:text-slate-400">Node {node}</span>
                               <span className="font-bold">{dist === Infinity ? '∞' : dist}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Prim's: MST size + Key values */}
+                    {selectedAlgorithm === 'prim' && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">MST Edges</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.highlights.mstEdges?.length ?? 0}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">In MST</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.highlights.path?.length ?? 0} / {currentStep.graph.nodes.length}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {selectedAlgorithm === 'prim' && currentStep.metadata.keys && (
+                      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1.5 uppercase tracking-wide">
+                          Key Values (min edge weight)
+                        </span>
+                        <div className="text-xs font-mono text-slate-900 dark:text-white space-y-0.5">
+                          {Object.entries(currentStep.metadata.keys).map(([node, k]) => (
+                            <div key={node} className="flex justify-between">
+                              <span className="text-slate-500 dark:text-slate-400">Node {node}</span>
+                              <span className="font-bold">{k === Infinity ? '∞' : k}</span>
                             </div>
                           ))}
                         </div>

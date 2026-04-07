@@ -43,7 +43,7 @@ export function usePlaybackController({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>('idle');
   const [playbackMode, setPlaybackMode] = useState<PlaybackMode>('continuous');
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(5);
 
   // Default empty step
   const defaultStep: Step = {

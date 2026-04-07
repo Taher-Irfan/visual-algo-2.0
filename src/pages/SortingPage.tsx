@@ -8,7 +8,7 @@ import PlaybackControls from '../components/PlaybackControls';
 import { algorithms, getAlgorithm, getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms';
 import { generateRandomArray } from '../utils/array';
 import { soundEngine } from '../utils/sound';
-import { usePlaybackController, useDarkMode } from '../hooks';
+import { usePlaybackController, useDarkMode, useSound } from '../hooks';
 import type { Step } from '../types';
 
 function SortingPage() {
@@ -20,7 +20,7 @@ function SortingPage() {
   const [arraySize, setArraySize] = useState(50);
   const [steps, setSteps] = useState<Step[]>([]);
   const [isDarkMode, setIsDarkMode] = useDarkMode();
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isSoundEnabled, setIsSoundEnabled] = useSound();
 
   // Use custom playback controller hook
   const {
@@ -51,11 +51,6 @@ function SortingPage() {
   useEffect(() => {
     soundEngine.initialize();
   }, []);
-
-  // Update sound engine when sound toggle changes
-  useEffect(() => {
-    soundEngine.setEnabled(isSoundEnabled);
-  }, [isSoundEnabled]);
 
   // Generate array and steps
   const handleGenerateArray = useCallback(() => {
@@ -95,6 +90,8 @@ function SortingPage() {
       navigate(`/searching/${defaultAlgo}`);
     } else if (newCategory === 'graph') {
       navigate(`/graph/${defaultAlgo}`);
+    } else if (newCategory === 'tree') {
+      navigate('/tree/segment');
     }
   };
 
@@ -105,8 +102,46 @@ function SortingPage() {
 
   const algorithm = getAlgorithm(category, selectedAlgorithm) || algorithms[selectedAlgorithm];
 
+  const stateInfo = (() => {
+    const meta = currentStep.metadata;
+    if (!meta) return undefined;
+    const items: { label: string; value: string | number }[] = [];
+    switch (selectedAlgorithm) {
+      case 'bubble':
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        break;
+      case 'selection':
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        if (meta.minIdx !== undefined) items.push({ label: 'minIdx', value: meta.minIdx });
+        break;
+      case 'insertion':
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        if (meta.key !== undefined) items.push({ label: 'key', value: meta.key });
+        break;
+      case 'merge':
+        if (meta.l !== undefined) items.push({ label: 'l', value: meta.l });
+        if (meta.r !== undefined) items.push({ label: 'r', value: meta.r });
+        if (meta.m !== undefined) items.push({ label: 'm', value: meta.m });
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        if (meta.k !== undefined) items.push({ label: 'k', value: meta.k });
+        break;
+      case 'quick':
+        if (meta.low !== undefined) items.push({ label: 'low', value: meta.low });
+        if (meta.high !== undefined) items.push({ label: 'high', value: meta.high });
+        if (meta.pivot !== undefined) items.push({ label: 'pivot', value: meta.pivot });
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        break;
+    }
+    return items.length > 0 ? items : undefined;
+  })();
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 transition-colors">
       <Navbar
         category={category}
         selectedAlgorithm={selectedAlgorithm}
@@ -127,7 +162,7 @@ function SortingPage() {
               highlights={currentStep.highlights}
             />
 
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft p-5 sm:p-6">
               <PlaybackControls
                 playbackStatus={playbackStatus}
                 playbackMode={playbackMode}
@@ -150,6 +185,7 @@ function SortingPage() {
               speed={speed}
               comparisons={currentStep.operations.comparisons}
               swaps={currentStep.operations.swaps}
+              stateInfo={stateInfo}
               onArraySizeChange={setArraySize}
               onSpeedChange={(newSpeed) => setSpeed(newSpeed)}
               onGenerateArray={handleGenerateArray}
@@ -159,6 +195,7 @@ function SortingPage() {
             <CodePanel
               code={algorithm.code}
               activeLine={currentStep.activeLine}
+              complexity={algorithm.complexity}
             />
           </div>
         </div>

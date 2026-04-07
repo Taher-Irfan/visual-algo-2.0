@@ -8,7 +8,7 @@ import PlaybackControls from '../components/PlaybackControls';
 import { algorithms, getAlgorithm, getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms';
 import { generateRandomArray } from '../utils/array';
 import { soundEngine } from '../utils/sound';
-import { usePlaybackController, useDarkMode } from '../hooks';
+import { usePlaybackController, useDarkMode, useSound } from '../hooks';
 import type { Step } from '../types';
 
 function SearchingPage() {
@@ -20,7 +20,7 @@ function SearchingPage() {
   const [arraySize, setArraySize] = useState(15);
   const [steps, setSteps] = useState<Step[]>([]);
   const [isDarkMode, setIsDarkMode] = useDarkMode();
-  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isSoundEnabled, setIsSoundEnabled] = useSound();
 
   // Use custom playback controller hook
   const {
@@ -51,11 +51,6 @@ function SearchingPage() {
   useEffect(() => {
     soundEngine.initialize();
   }, []);
-
-  // Update sound engine when sound toggle changes
-  useEffect(() => {
-    soundEngine.setEnabled(isSoundEnabled);
-  }, [isSoundEnabled]);
 
   // Generate array and steps
   const handleGenerateArray = useCallback(() => {
@@ -94,6 +89,8 @@ function SearchingPage() {
       navigate(`/searching/${defaultAlgo}`);
     } else if (newCategory === 'graph') {
       navigate(`/graph/${defaultAlgo}`);
+    } else if (newCategory === 'tree') {
+      navigate('/tree/segment');
     }
   };
 
@@ -104,8 +101,24 @@ function SearchingPage() {
 
   const algorithm = getAlgorithm(category, selectedAlgorithm) || algorithms[selectedAlgorithm];
 
+  const stateInfo = (() => {
+    const meta = currentStep.metadata;
+    if (!meta) return undefined;
+    const items: { label: string; value: string | number }[] = [];
+    if (meta.target !== undefined) items.push({ label: 'target', value: meta.target });
+    if (meta.currentIndex !== undefined) items.push({ label: 'i', value: meta.currentIndex });
+    if (meta.searchRange !== undefined) {
+      items.push({ label: 'left', value: meta.searchRange.left });
+      items.push({ label: 'right', value: meta.searchRange.right });
+      if (meta.searchRange.mid !== undefined) items.push({ label: 'mid', value: meta.searchRange.mid });
+    }
+    if (meta.found !== undefined) items.push({ label: 'found', value: meta.found ? 'true' : 'false' });
+    if (meta.foundIndex !== undefined && meta.foundIndex !== -1) items.push({ label: 'index', value: meta.foundIndex });
+    return items.length > 0 ? items : undefined;
+  })();
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 transition-colors">
       <Navbar
         category={category}
         selectedAlgorithm={selectedAlgorithm}
@@ -127,7 +140,7 @@ function SearchingPage() {
               metadata={currentStep.metadata}
             />
 
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft p-5 sm:p-6">
               <PlaybackControls
                 playbackStatus={playbackStatus}
                 playbackMode={playbackMode}
@@ -149,6 +162,7 @@ function SearchingPage() {
               arraySize={arraySize}
               speed={speed}
               comparisons={currentStep.operations.comparisons}
+              stateInfo={stateInfo}
               onArraySizeChange={setArraySize}
               onSpeedChange={(newSpeed) => setSpeed(newSpeed)}
               onGenerateArray={handleGenerateArray}

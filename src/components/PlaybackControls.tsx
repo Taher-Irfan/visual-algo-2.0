@@ -37,56 +37,61 @@ export default function PlaybackControls({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-center space-x-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1">
+      {/* Mode Toggle */}
+      <div className="flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 gap-1">
         <button
           onClick={() => onModeChange('continuous')}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             playbackMode === 'continuous'
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
           Continuous
         </button>
         <button
           onClick={() => onModeChange('step')}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
             playbackMode === 'step'
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
         >
-          <div className="flex items-center justify-center space-x-1">
-            <StepForward className="w-4 h-4" />
+          <div className="flex items-center justify-center space-x-1.5">
+            <StepForward className="w-3.5 h-3.5" />
             <span>Step Mode</span>
           </div>
         </button>
       </div>
 
+      {/* Playback Buttons */}
       <div className="flex items-center justify-center space-x-2">
+        {/* Replay */}
         <button
           onClick={onReplay}
           disabled={!canStepBackward && !canStepForward}
-          className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label="Replay"
         >
           <RotateCcw className="w-5 h-5" />
         </button>
 
+        {/* Step Backward */}
         <button
           onClick={onStepBackward}
           disabled={!canStepBackward}
-          className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label="Step backward"
         >
           <SkipBack className="w-5 h-5" />
         </button>
 
+        {/* Primary: Play/Pause or Step Forward */}
         {playbackMode === 'continuous' ? (
           <button
             onClick={isPlaying ? onPause : onPlay}
             disabled={isFinished || !canStepForward}
-            className="p-4 rounded-lg bg-primary-500 hover:bg-primary-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-lg"
+            className="p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             aria-label={isPlaying ? 'Pause' : 'Play'}
           >
             {isPlaying ? (
@@ -99,17 +104,18 @@ export default function PlaybackControls({
           <button
             onClick={onStepForward}
             disabled={!canStepForward}
-            className="p-4 rounded-lg bg-primary-500 hover:bg-primary-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-lg"
+            className="p-4 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             aria-label="Step forward"
           >
             <SkipForward className="w-6 h-6" />
           </button>
         )}
 
+        {/* Step Forward */}
         <button
           onClick={onStepForward}
           disabled={!canStepForward}
-          className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
           aria-label="Step forward"
         >
           <SkipForward className="w-5 h-5" />

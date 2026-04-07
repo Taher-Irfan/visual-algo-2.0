@@ -50,7 +50,7 @@ function dfsHelper(
     steps.push({
       graph,
       activeLine: 4,
-      highlights: { visiting: [node, neighbor], visited: Array.from(visited), path: [] },
+      highlights: { current: [node], visiting: [neighbor], visited: Array.from(visited), path: [] },
       metadata: { stack: [...callStack], currentNode: node, startNode },
     });
 
@@ -58,7 +58,7 @@ function dfsHelper(
     steps.push({
       graph,
       activeLine: 5,
-      highlights: { visiting: [node, neighbor], visited: Array.from(visited), path: [] },
+      highlights: { current: [node], visiting: [neighbor], visited: Array.from(visited), path: [] },
       metadata: { stack: [...callStack], currentNode: node, startNode },
     });
 

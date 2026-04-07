@@ -83,6 +83,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 2,
       highlights: { comparing: [high] },
       operations: { comparisons, swaps },
+      metadata: { low, high, pivot },
     });
 
     let i = low - 1;
@@ -93,6 +94,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 3,
       highlights: { comparing: [high] },
       operations: { comparisons, swaps },
+      metadata: { low, high, pivot, i },
     });
 
     for (let j = low; j < high; j++) {
@@ -103,6 +105,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 5,
         highlights: { comparing: [j, high] },
         operations: { comparisons, swaps },
+        metadata: { low, high, pivot, i, j },
       });
 
       if (arr[j] < pivot) {
@@ -116,6 +119,7 @@ function generateSteps(array: number[]): Step[] {
           activeLine: 7,
           highlights: { swapping: [i, j] },
           operations: { comparisons, swaps },
+          metadata: { low, high, pivot, i, j },
         });
       }
     }
@@ -128,6 +132,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 10,
       highlights: { swapping: [i + 1, high] },
       operations: { comparisons, swaps },
+      metadata: { low, high, pivot, i },
     });
 
     // Step: Mark pivot as sorted (line 11)
@@ -136,6 +141,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 11,
       highlights: { sorted: [i + 1] },
       operations: { comparisons, swaps },
+      metadata: { low, high, pivot },
     });
 
     return i + 1;
@@ -147,11 +153,12 @@ function generateSteps(array: number[]): Step[] {
     steps.push({
       array: [...arr],
       activeLine: 14,
-      highlights: { 
+      highlights: {
         comparing: low <= high ? [low, high] : [],
         sorted: Array.from(sortedIndices)
       },
       operations: { comparisons, swaps },
+      metadata: { low, high },
     });
 
     if (low < high) {
@@ -159,11 +166,12 @@ function generateSteps(array: number[]): Step[] {
       steps.push({
         array: [...arr],
         activeLine: 15,
-        highlights: { 
+        highlights: {
           comparing: [low, high],
           sorted: Array.from(sortedIndices)
         },
         operations: { comparisons, swaps },
+        metadata: { low, high },
       });
 
       const pi = partition(low, high);
@@ -199,4 +207,10 @@ export const quickSort: Algorithm = {
   name: 'Quick Sort',
   generateSteps,
   code,
+  complexity: {
+    best: 'O(n log n)',
+    average: 'O(n log n)',
+    worst: 'O(n²)',
+    space: 'O(log n)',
+  },
 };

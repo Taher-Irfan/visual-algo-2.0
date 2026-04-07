@@ -70,7 +70,7 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
     graph,
     activeLine: 5,
     highlights: { visiting: [startNode], visited: [], path: [], mstEdges: [] },
-    metadata: { queue: [startNode], currentNode: startNode, startNode },
+    metadata: { queue: [startNode], currentNode: startNode, startNode, keys: { ...key } },
   });
 
   while (pq.length > 0) {
@@ -87,7 +87,7 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
         path: Array.from(inMST),
         mstEdges: mstEdges.map(e => ({ ...e })),
       },
-      metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+      metadata: { queue: pq.map(p => p.node), currentNode: current, startNode, keys: { ...key } },
     });
 
     if (inMST.has(current)) {
@@ -101,7 +101,7 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
           path: Array.from(inMST),
           mstEdges: mstEdges.map(e => ({ ...e })),
         },
-        metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+        metadata: { queue: pq.map(p => p.node), currentNode: current, startNode, keys: { ...key } },
       });
       continue;
     }
@@ -122,7 +122,7 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
         path: Array.from(inMST),
         mstEdges: mstEdges.map(e => ({ ...e })),
       },
-      metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+      metadata: { queue: pq.map(p => p.node), currentNode: current, startNode, keys: { ...key } },
     });
 
     const neighbors = adjacencyList.get(current) || [];
@@ -135,12 +135,13 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
         graph,
         activeLine: 17,
         highlights: {
-          visiting: [current, neighbor],
+          current: [current],
+          visiting: [neighbor],
           visited: Array.from(inMST),
           path: Array.from(inMST),
           mstEdges: mstEdges.map(e => ({ ...e })),
         },
-        metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+        metadata: { queue: pq.map(p => p.node), currentNode: current, startNode, keys: { ...key } },
       });
 
       if (weight < key[neighbor]) {
@@ -158,7 +159,7 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
             path: Array.from(inMST),
             mstEdges: mstEdges.map(e => ({ ...e })),
           },
-          metadata: { queue: pq.map(p => p.node), currentNode: current, startNode },
+          metadata: { queue: pq.map(p => p.node), currentNode: current, startNode, keys: { ...key } },
         });
       }
     }
@@ -174,7 +175,7 @@ export function generatePrimSteps(graph: Graph, startNode: string): GraphStep[] 
       path: Array.from(inMST),
       mstEdges: mstEdges.map(e => ({ ...e })),
     },
-    metadata: { queue: [], currentNode: undefined, startNode },
+    metadata: { queue: [], currentNode: undefined, startNode, keys: { ...key } },
   });
 
   return steps;

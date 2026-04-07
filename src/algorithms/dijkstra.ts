@@ -113,10 +113,11 @@ export function generateDijkstraSteps(graph: Graph, startNode: string): GraphSte
       steps.push({
         graph,
         activeLine: 23,
-        highlights: { 
-          visiting: [current, neighbor], 
-          visited: Array.from(visited), 
-          path: [] 
+        highlights: {
+          current: [current],
+          visiting: [neighbor],
+          visited: Array.from(visited),
+          path: []
         },
         metadata: { 
           queue: pq.map(p => p.node), 

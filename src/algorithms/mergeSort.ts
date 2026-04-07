@@ -88,6 +88,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 2,
       highlights: { comparing: [l, m, r] },
       operations: { comparisons, swaps },
+      metadata: { l, r, m },
     });
 
     // Create temp arrays
@@ -102,6 +103,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 4,
         highlights: { comparing: [l + i] },
         operations: { comparisons, swaps },
+        metadata: { l, r, m, i },
       });
     }
 
@@ -112,6 +114,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 5,
         highlights: { comparing: [m + 1 + j] },
         operations: { comparisons, swaps },
+        metadata: { l, r, m, j },
       });
     }
 
@@ -124,6 +127,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 6,
       highlights: { comparing: [l] },
       operations: { comparisons, swaps },
+      metadata: { l, r, m, i, j, k },
     });
 
     while (i < n1 && j < n2) {
@@ -134,6 +138,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 8,
         highlights: { comparing: [l + i, m + 1 + j] },
         operations: { comparisons, swaps },
+        metadata: { l, r, m, i, j, k },
       });
 
       if (L[i] <= R[j]) {
@@ -144,6 +149,7 @@ function generateSteps(array: number[]): Step[] {
           activeLine: 8,
           highlights: { swapping: [k] },
           operations: { comparisons, swaps },
+          metadata: { l, r, m, i, j, k },
         });
         i++;
       } else {
@@ -154,6 +160,7 @@ function generateSteps(array: number[]): Step[] {
           activeLine: 9,
           highlights: { swapping: [k] },
           operations: { comparisons, swaps },
+          metadata: { l, r, m, i, j, k },
         });
         j++;
       }
@@ -169,6 +176,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 11,
         highlights: { swapping: [k] },
         operations: { comparisons, swaps },
+        metadata: { l, r, m, i, k },
       });
       i++;
       k++;
@@ -183,6 +191,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 12,
         highlights: { swapping: [k] },
         operations: { comparisons, swaps },
+        metadata: { l, r, m, j, k },
       });
       j++;
       k++;
@@ -194,6 +203,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 13,
       highlights: { sorted: Array.from({ length: r - l + 1 }, (_, idx) => l + idx) },
       operations: { comparisons, swaps },
+      metadata: { l, r, m },
     });
   }
 
@@ -205,6 +215,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 15,
       highlights: { comparing: l <= r ? [l, r] : [] },
       operations: { comparisons, swaps },
+      metadata: { l, r },
     });
 
     if (l < r) {
@@ -215,6 +226,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 16,
         highlights: { comparing: [l, m, r] },
         operations: { comparisons, swaps },
+        metadata: { l, r, m },
       });
 
       // Recursively sort first half
@@ -246,4 +258,10 @@ export const mergeSort: Algorithm = {
   name: 'Merge Sort',
   generateSteps,
   code,
+  complexity: {
+    best: 'O(n log n)',
+    average: 'O(n log n)',
+    worst: 'O(n log n)',
+    space: 'O(n)',
+  },
 };

@@ -68,6 +68,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 3,
       highlights: { comparing: [i] },
       operations: { comparisons, swaps },
+      metadata: { i, minIdx },
     });
 
     // Inner loop: j from i+1 to n-1
@@ -79,18 +80,20 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 5,
         highlights: { comparing: [j, minIdx] },
         operations: { comparisons, swaps },
+        metadata: { i, j, minIdx },
       });
 
       // If found new minimum, update minIdx
       if (arr[j] < arr[minIdx]) {
         minIdx = j;
-        
+
         // Step: Update minIdx (line 6)
         steps.push({
           array: [...arr],
           activeLine: 6,
           highlights: { comparing: [minIdx] },
           operations: { comparisons, swaps },
+          metadata: { i, j, minIdx },
         });
       }
     }
@@ -106,6 +109,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 9,
       highlights: { swapping: [i, minIdx] },
       operations: { comparisons, swaps },
+      metadata: { i, minIdx },
     });
 
     // Step: Mark sorted portion (line 2 - outer loop continues)
@@ -115,6 +119,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 2,
       highlights: { sorted: Array.from({ length: i + 1 }, (_, k) => k) },
       operations: { comparisons, swaps },
+      metadata: { i },
     });
   }
 
@@ -134,4 +139,10 @@ export const selectionSort: Algorithm = {
   name: 'Selection Sort',
   generateSteps,
   code,
+  complexity: {
+    best: 'O(n²)',
+    average: 'O(n²)',
+    worst: 'O(n²)',
+    space: 'O(1)',
+  },
 };

@@ -1,87 +1,71 @@
-import { useRef } from 'react';
-
-/**
- * CodePanel Component
- * 
- * Displays algorithm code with syntax highlighting and active line tracking.
- * Connected to playback system - highlights the currently executing line.
- * 
- * Features:
- * - Line numbers
- * - Active line highlighting (yellow)
- * - Scrollable container
- * - Premium dark theme
- * - Smooth transitions
- */
+import type { Complexity } from '../types';
 
 interface CodePanelProps {
   /** Algorithm code (C++ syntax) - can be string or array of lines */
   code: string | string[];
   /** Currently executing line number (1-indexed) */
   activeLine: number;
+  /** Time and space complexity information */
+  complexity?: Complexity;
 }
 
-export default function CodePanel({ code, activeLine }: CodePanelProps) {
+export default function CodePanel({ code, activeLine, complexity }: CodePanelProps) {
   const lines = Array.isArray(code) ? code : code.split('\n');
-  const activeLineRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6 flex flex-col">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft p-5 sm:p-6 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">
           Algorithm Code
         </h3>
-        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+        <span className="text-xs text-slate-400 dark:text-slate-500 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
           C++
         </span>
       </div>
 
-      {/* Code Container — fixed height so it's always visible regardless of parent layout */}
+      {/* Code Container — always dark for premium terminal feel */}
       <div
-        ref={containerRef}
-        className="h-[260px] sm:h-[340px] overflow-auto scrollbar-thin bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+        className="h-[260px] sm:h-[340px] overflow-auto code-scroll bg-slate-900 rounded-xl border border-slate-700/50"
       >
         <pre className="text-sm font-mono leading-relaxed p-4">
           {lines.map((line, index) => {
             const lineNumber = index + 1;
             const isActive = lineNumber === activeLine;
-            
+
             return (
               <div
                 key={index}
-                ref={isActive ? activeLineRef : null}
-                className={`flex items-center min-h-[1.5rem] px-2 -mx-2 rounded transition-all duration-200 ${
+                className={`flex items-stretch min-h-[1.625rem] rounded transition-all duration-150 ${
                   isActive
-                    ? 'bg-yellow-100 dark:bg-yellow-900/30 shadow-sm'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700/30'
+                    ? 'bg-yellow-400/15'
+                    : 'hover:bg-white/5'
                 }`}
               >
+                {/* Active line indicator bar */}
+                <span
+                  className={`w-0.5 flex-shrink-0 rounded-full mr-3 transition-all duration-200 ${
+                    isActive ? 'bg-yellow-400' : 'bg-transparent'
+                  }`}
+                />
+
                 {/* Line Number */}
                 <span
-                  className={`inline-block w-12 flex-shrink-0 text-right pr-4 select-none transition-colors ${
+                  className={`inline-block w-8 flex-shrink-0 text-right pr-4 select-none transition-colors duration-150 ${
                     isActive
-                      ? 'text-yellow-700 dark:text-yellow-400 font-bold'
-                      : 'text-gray-400 dark:text-gray-500'
+                      ? 'text-yellow-400 font-semibold'
+                      : 'text-slate-600'
                   }`}
                 >
                   {lineNumber}
                 </span>
-                
-                {/* Vertical Line Separator */}
-                <span className={`w-px h-full mr-4 ${
-                  isActive 
-                    ? 'bg-yellow-300 dark:bg-yellow-700' 
-                    : 'bg-gray-300 dark:bg-gray-600'
-                }`} />
-                
+
                 {/* Code Line */}
                 <span
-                  className={`flex-1 whitespace-pre transition-colors ${
+                  className={`flex-1 whitespace-pre transition-all duration-150 ${
                     isActive
-                      ? 'text-gray-900 dark:text-white font-medium'
-                      : 'text-gray-700 dark:text-gray-300'
+                      ? 'text-white font-medium'
+                      : 'text-slate-400 opacity-75'
                   }`}
                 >
                   {line || ' '}
@@ -91,19 +75,46 @@ export default function CodePanel({ code, activeLine }: CodePanelProps) {
           })}
         </pre>
       </div>
-      
+
       {/* Footer Info */}
-      <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+      <div className="mt-3 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
         <span>
           {lines.length} {lines.length === 1 ? 'line' : 'lines'}
         </span>
         {activeLine > 0 && (
-          <span className="flex items-center space-x-1">
-            <span className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+          <span className="flex items-center space-x-1.5">
+            <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" />
             <span>Line {activeLine}</span>
           </span>
         )}
       </div>
+
+      {/* Complexity Table */}
+      {complexity && (
+        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+          <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+            Complexity
+          </h4>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
+              <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Best</div>
+              <div className="text-sm font-mono font-semibold text-emerald-600 dark:text-emerald-400">{complexity.best}</div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
+              <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Average</div>
+              <div className="text-sm font-mono font-semibold text-amber-600 dark:text-amber-400">{complexity.average}</div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
+              <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Worst</div>
+              <div className="text-sm font-mono font-semibold text-red-600 dark:text-red-400">{complexity.worst}</div>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
+              <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Space</div>
+              <div className="text-sm font-mono font-semibold text-blue-600 dark:text-blue-400">{complexity.space}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

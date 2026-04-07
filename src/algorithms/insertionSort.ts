@@ -68,6 +68,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 3,
       highlights: { comparing: [i] },
       operations: { comparisons, swaps },
+      metadata: { i, key },
     });
 
     let j = i - 1;
@@ -78,6 +79,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 4,
       highlights: { comparing: [i, j] },
       operations: { comparisons, swaps },
+      metadata: { i, j, key },
     });
 
     // Inner loop: shift elements greater than key
@@ -89,6 +91,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 5,
         highlights: { comparing: [j, i] },
         operations: { comparisons, swaps },
+        metadata: { i, j, key },
       });
 
       // Step: Shift element to the right (line 6)
@@ -99,6 +102,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 6,
         highlights: { swapping: [j, j + 1] },
         operations: { comparisons, swaps },
+        metadata: { i, j, key },
       });
 
       j--;
@@ -112,6 +116,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 5,
         highlights: { comparing: [j, i] },
         operations: { comparisons, swaps },
+        metadata: { i, j, key },
       });
     }
 
@@ -122,6 +127,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 9,
       highlights: { swapping: [j + 1] },
       operations: { comparisons, swaps },
+      metadata: { i, j, key },
     });
 
     // Step: Mark sorted portion (line 2)
@@ -130,6 +136,7 @@ function generateSteps(array: number[]): Step[] {
       activeLine: 2,
       highlights: { sorted: Array.from({ length: i + 1 }, (_, k) => k) },
       operations: { comparisons, swaps },
+      metadata: { i },
     });
   }
 
@@ -149,4 +156,10 @@ export const insertionSort: Algorithm = {
   name: 'Insertion Sort',
   generateSteps,
   code,
+  complexity: {
+    best: 'O(n)',
+    average: 'O(n²)',
+    worst: 'O(n²)',
+    space: 'O(1)',
+  },
 };

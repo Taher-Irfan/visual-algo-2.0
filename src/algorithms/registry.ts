@@ -7,7 +7,7 @@ import { mergeSort } from './mergeSort';
 import { linearSearch } from './linearSearch';
 import { binarySearch } from './binarySearch';
 
-export type AlgorithmCategory = 'sorting' | 'searching' | 'graph';
+export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree';
 
 export interface CategoryAlgorithms {
   [algorithmId: string]: Algorithm;
@@ -97,6 +97,7 @@ export function getDefaultAlgorithm(category: AlgorithmCategory): string {
     sorting: 'bubble',
     searching: 'linear',
     graph: 'bfs',
+    tree: 'segment',
   };
   return defaultMap[category] || 'bubble';
 }

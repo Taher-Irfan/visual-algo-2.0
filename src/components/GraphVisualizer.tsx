@@ -1,8 +1,10 @@
-import type { Graph } from '../types';
+import { useState, useRef, useEffect } from 'react';
+import type { Graph, GraphNode } from '../types';
 
 interface GraphVisualizerProps {
   graph: Graph;
   highlights: {
+    current?: string[];
     visiting?: string[];
     visited?: string[];
     path?: string[];
@@ -13,58 +15,118 @@ interface GraphVisualizerProps {
 }
 
 export default function GraphVisualizer({ graph, highlights, nodeLabels, showEdgeWeights = true }: GraphVisualizerProps) {
-  const { visiting = [], visited = [], path = [] } = highlights;
+  const { current = [], visiting = [], visited = [], path = [] } = highlights;
 
-  const getNodeColor = (nodeId: string): string => {
-    if (path.includes(nodeId)) return 'fill-green-500 dark:fill-green-400';
-    if (visiting.includes(nodeId)) return 'fill-yellow-500 dark:fill-yellow-400';
-    if (visited.includes(nodeId)) return 'fill-blue-500 dark:fill-blue-400';
-    return 'fill-gray-400 dark:fill-gray-600';
+  const svgRef = useRef<SVGSVGElement>(null);
+  const draggingIdRef = useRef<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [positionOverrides, setPositionOverrides] = useState<Record<string, { x: number; y: number }>>({});
+
+  // Reset overrides when the graph topology changes
+  const nodeIdsKey = graph.nodes.map(n => n.id).join(',');
+  useEffect(() => {
+    setPositionOverrides({});
+  }, [nodeIdsKey]);
+
+  const getPos = (node: GraphNode) => positionOverrides[node.id] ?? node.position;
+
+  // Attach drag handlers to window so dragging works even when cursor leaves the SVG
+  useEffect(() => {
+    const domToSVG = (clientX: number, clientY: number) => {
+      const svg = svgRef.current;
+      if (!svg) return { x: 0, y: 0 };
+      const pt = svg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return { x: 0, y: 0 };
+      return pt.matrixTransform(ctm.inverse());
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!draggingIdRef.current) return;
+      const pos = domToSVG(e.clientX, e.clientY);
+      setPositionOverrides(prev => ({ ...prev, [draggingIdRef.current!]: { x: pos.x, y: pos.y } }));
+    };
+
+    const onMouseUp = () => {
+      draggingIdRef.current = null;
+      setIsDragging(false);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
+  const handleNodeMouseDown = (nodeId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    draggingIdRef.current = nodeId;
+    setIsDragging(true);
   };
 
-  const getNodeStroke = (nodeId: string): string => {
-    if (path.includes(nodeId)) return 'stroke-green-700 dark:stroke-green-300';
-    if (visiting.includes(nodeId)) return 'stroke-yellow-700 dark:stroke-yellow-300';
-    if (visited.includes(nodeId)) return 'stroke-blue-700 dark:stroke-blue-300';
-    return 'stroke-gray-600 dark:stroke-gray-500';
+  const getNodeFill = (nodeId: string): string => {
+    if (path.includes(nodeId)) return '#10b981';      // emerald — in final path
+    if (current.includes(nodeId)) return '#8b5cf6';   // violet — source/current node
+    if (visiting.includes(nodeId)) return '#f59e0b';  // amber — adjacent neighbor
+    if (visited.includes(nodeId)) return '#3b82f6';   // blue — already visited
+    return '#94a3b8';                                  // slate — default
+  };
+
+  const getNodeStrokeColor = (nodeId: string): string => {
+    if (path.includes(nodeId)) return '#059669';
+    if (current.includes(nodeId)) return '#7c3aed';
+    if (visiting.includes(nodeId)) return '#d97706';
+    if (visited.includes(nodeId)) return '#2563eb';
+    return '#64748b';
   };
 
   const getEdgeColor = (sourceId: string, targetId: string): string => {
-    // MST edges (Prim) — explicitly tracked
     if (highlights.mstEdges) {
       const isMSTEdge = highlights.mstEdges.some(
         e => (e.source === sourceId && e.target === targetId) ||
              (e.source === targetId && e.target === sourceId)
       );
-      return isMSTEdge
-        ? 'stroke-green-400 dark:stroke-green-500'
-        : 'stroke-gray-300 dark:stroke-gray-700';
+      return isMSTEdge ? '#10b981' : '#cbd5e1';
     }
 
     const isPathEdge =
       (path.includes(sourceId) && path.includes(targetId)) ||
       (visited.includes(sourceId) && visited.includes(targetId));
 
-    return isPathEdge
-      ? 'stroke-blue-400 dark:stroke-blue-500'
-      : 'stroke-gray-300 dark:stroke-gray-700';
+    return isPathEdge ? '#60a5fa' : '#cbd5e1';
   };
 
-  // Compute a tight viewBox from actual node positions so the graph
-  // is always displayed at 1px = 1px (no squishing) and the container
-  // can scroll when the graph is larger than the viewport.
+  const getEdgeWidth = (sourceId: string, targetId: string): number => {
+    if (highlights.mstEdges) {
+      const isMSTEdge = highlights.mstEdges.some(
+        e => (e.source === sourceId && e.target === targetId) ||
+             (e.source === targetId && e.target === sourceId)
+      );
+      return isMSTEdge ? 4 : 2;
+    }
+    const isPathEdge =
+      (path.includes(sourceId) && path.includes(targetId)) ||
+      (visited.includes(sourceId) && visited.includes(targetId));
+    return isPathEdge ? 3 : 2;
+  };
+
   const NODE_RADIUS = 20;
-  const VB_PADDING = 40;
-  // Extra right padding when node labels are shown beside nodes
+  const VB_PADDING = 44;
   const LABEL_RIGHT_EXTRA = nodeLabels ? 36 : 0;
+
+  // Compute viewBox from effective positions (includes drag overrides)
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   graph.nodes.forEach(n => {
-    minX = Math.min(minX, n.position.x);
-    minY = Math.min(minY, n.position.y);
-    maxX = Math.max(maxX, n.position.x);
-    maxY = Math.max(maxY, n.position.y);
+    const pos = getPos(n);
+    minX = Math.min(minX, pos.x);
+    minY = Math.min(minY, pos.y);
+    maxX = Math.max(maxX, pos.x);
+    maxY = Math.max(maxY, pos.y);
   });
-  // Fallback for empty graph
   if (!isFinite(minX)) { minX = 0; minY = 0; maxX = 400; maxY = 400; }
   const vbX = minX - NODE_RADIUS - VB_PADDING;
   const vbY = minY - NODE_RADIUS - VB_PADDING;
@@ -72,68 +134,79 @@ export default function GraphVisualizer({ graph, highlights, nodeLabels, showEdg
   const vbH = maxY - minY + (NODE_RADIUS + VB_PADDING) * 2;
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-soft p-4 sm:p-6 flex flex-col">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft p-5 sm:p-6 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-white">
           Graph Visualization
         </h2>
       </div>
 
-      {/* Scrollable in both axes; SVG rendered at natural pixel size */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg overflow-auto max-h-[280px] sm:max-h-[460px]">
+      {/* Scrollable SVG area */}
+      <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl overflow-auto max-h-[280px] sm:max-h-[460px] border border-slate-100 dark:border-slate-700/50">
         <svg
-          style={{ width: `${vbW}px`, height: `${vbH}px`, minWidth: '100%', display: 'block' }}
+          ref={svgRef}
+          style={{ width: `${vbW}px`, height: `${vbH}px`, minWidth: '100%', display: 'block', cursor: isDragging ? 'grabbing' : 'default' }}
           viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
           preserveAspectRatio="xMidYMid meet"
         >
-          {/* Render edges first (so they appear behind nodes) */}
+          {/* Drop shadow filter for nodes */}
+          <defs>
+            <filter id="node-shadow" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.18" />
+            </filter>
+          </defs>
+
+          {/* Edges */}
           {graph.edges.map((edge, index) => {
             const sourceNode = graph.nodes.find(n => n.id === edge.source);
             const targetNode = graph.nodes.find(n => n.id === edge.target);
-            
+
             if (!sourceNode || !targetNode) return null;
 
-            const midX = (sourceNode.position.x + targetNode.position.x) / 2;
-            const midY = (sourceNode.position.y + targetNode.position.y) / 2;
-
-            // Perpendicular offset so weight labels don't overlap node labels
-            const dx = targetNode.position.x - sourceNode.position.x;
-            const dy = targetNode.position.y - sourceNode.position.y;
+            const sp = getPos(sourceNode);
+            const tp = getPos(targetNode);
+            const midX = (sp.x + tp.x) / 2;
+            const midY = (sp.y + tp.y) / 2;
+            const dx = tp.x - sp.x;
+            const dy = tp.y - sp.y;
             const len = Math.sqrt(dx * dx + dy * dy) || 1;
             const PERP_OFFSET = 13;
             const labelX = midX + (-dy / len) * PERP_OFFSET;
             const labelY = midY + (dx / len) * PERP_OFFSET;
 
-            const isMSTEdge = highlights.mstEdges?.some(
-              e => (e.source === edge.source && e.target === edge.target) ||
-                   (e.source === edge.target && e.target === edge.source)
-            ) ?? false;
+            const edgeColor = getEdgeColor(edge.source, edge.target);
+            const edgeWidth = getEdgeWidth(edge.source, edge.target);
 
             return (
               <g key={`edge-${index}`}>
                 <line
-                  x1={sourceNode.position.x}
-                  y1={sourceNode.position.y}
-                  x2={targetNode.position.x}
-                  y2={targetNode.position.y}
-                  className={`${getEdgeColor(edge.source, edge.target)} transition-colors duration-300`}
-                  strokeWidth={isMSTEdge ? "3.5" : "2"}
+                  x1={sp.x}
+                  y1={sp.y}
+                  x2={tp.x}
+                  y2={tp.y}
+                  stroke={edgeColor}
+                  strokeWidth={edgeWidth}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke 0.3s ease, stroke-width 0.3s ease' }}
                 />
                 {showEdgeWeights && edge.weight !== undefined && (
                   <g>
                     <circle
                       cx={labelX}
                       cy={labelY}
-                      r="10"
-                      className="fill-white dark:fill-gray-700 stroke-gray-300 dark:stroke-gray-600"
-                      strokeWidth="1"
+                      r="11"
+                      fill="white"
+                      stroke="#e2e8f0"
+                      strokeWidth="1.5"
                     />
                     <text
                       x={labelX}
                       y={labelY}
                       textAnchor="middle"
                       dominantBaseline="central"
-                      className="text-xs font-bold fill-gray-700 dark:fill-gray-300 pointer-events-none select-none"
+                      fontSize="10"
+                      fontWeight="700"
+                      fill="#475569"
                     >
                       {edge.weight}
                     </text>
@@ -143,46 +216,68 @@ export default function GraphVisualizer({ graph, highlights, nodeLabels, showEdg
             );
           })}
 
-          {/* Render nodes */}
+          {/* Nodes */}
           {graph.nodes.map((node) => {
             const label = nodeLabels?.[node.id];
             const labelText = label === undefined ? null : label === Infinity ? '∞' : String(label);
+            const nodeFill = getNodeFill(node.id);
+            const nodeStroke = getNodeStrokeColor(node.id);
+            const isActive = current.includes(node.id) || visiting.includes(node.id);
+            const pos = getPos(node);
+
             return (
-              <g key={node.id}>
+              // <g> has no transform — circle and text are positioned via cx/cy and x/y
+              <g
+                key={node.id}
+                style={{ cursor: 'grab' }}
+                onMouseDown={(e) => handleNodeMouseDown(node.id, e)}
+              >
                 <circle
-                  cx={node.position.x}
-                  cy={node.position.y}
+                  cx={pos.x}
+                  cy={pos.y}
                   r="20"
-                  className={`${getNodeColor(node.id)} ${getNodeStroke(node.id)} transition-all duration-300`}
-                  strokeWidth="3"
+                  fill={nodeFill}
+                  stroke={nodeStroke}
+                  strokeWidth="2.5"
+                  filter="url(#node-shadow)"
+                  style={{
+                    transform: isActive ? 'scale(1.15)' : 'scale(1)',
+                    // Explicit origin in SVG-space px so scale stays centered on the circle
+                    transformOrigin: `${pos.x}px ${pos.y}px`,
+                    transition: 'fill 0.25s ease, transform 0.25s ease, stroke 0.25s ease',
+                  }}
                 />
                 <text
-                  x={node.position.x}
-                  y={node.position.y}
+                  x={pos.x}
+                  y={pos.y}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  className="text-sm font-bold fill-white dark:fill-gray-900 pointer-events-none select-none"
+                  fontSize="12"
+                  fontWeight="700"
+                  fill="white"
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}
                 >
                   {node.id}
                 </text>
                 {labelText !== null && (
                   <g>
                     <rect
-                      x={node.position.x + 22}
-                      y={node.position.y - 9}
+                      x={pos.x + 22}
+                      y={pos.y - 9}
                       width="28"
                       height="18"
-                      rx="4"
-                      className="fill-gray-200 dark:fill-gray-700"
+                      rx="5"
+                      fill="#e2e8f0"
                     />
                     <text
-                      x={node.position.x + 36}
-                      y={node.position.y}
+                      x={pos.x + 36}
+                      y={pos.y}
                       textAnchor="middle"
                       dominantBaseline="central"
                       fontSize="10"
                       fontWeight="700"
-                      className="fill-gray-800 dark:fill-gray-100 pointer-events-none select-none"
+                      fill="#1e293b"
+                      style={{ pointerEvents: 'none', userSelect: 'none' }}
                     >
                       {labelText}
                     </text>
@@ -195,23 +290,19 @@ export default function GraphVisualizer({ graph, highlights, nodeLabels, showEdg
       </div>
 
       {/* Legend */}
-      <div className="mt-3 flex items-center justify-center flex-wrap gap-3 sm:space-x-6 text-sm">
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 rounded-full bg-gray-400 dark:bg-gray-600"></div>
-          <span className="text-gray-700 dark:text-gray-300">Default</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 rounded-full bg-yellow-500 dark:bg-yellow-400"></div>
-          <span className="text-gray-700 dark:text-gray-300">Visiting</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 rounded-full bg-blue-500 dark:bg-blue-400"></div>
-          <span className="text-gray-700 dark:text-gray-300">Visited</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 rounded-full bg-green-500 dark:bg-green-400"></div>
-          <span className="text-gray-700 dark:text-gray-300">Path</span>
-        </div>
+      <div className="mt-4 flex items-center justify-center flex-wrap gap-4 text-xs">
+        {[
+          { color: 'bg-slate-400', label: 'Default' },
+          { color: 'bg-violet-500', label: 'Current' },
+          { color: 'bg-amber-500', label: 'Neighbor' },
+          { color: 'bg-blue-500', label: 'Visited' },
+          { color: 'bg-emerald-500', label: 'Path' },
+        ].map(({ color, label }) => (
+          <div key={label} className="flex items-center space-x-1.5">
+            <div className={`w-3 h-3 rounded-full ${color}`} />
+            <span className="text-slate-500 dark:text-slate-400">{label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

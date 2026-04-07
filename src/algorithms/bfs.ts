@@ -85,7 +85,8 @@ export function generateBFSSteps(graph: Graph, startNode: string): GraphStep[] {
         graph,
         activeLine: 18,
         highlights: {
-          visiting: [current, neighbor],
+          current: [current],
+          visiting: [neighbor],
           visited: Array.from(visited),
           path: []
         },

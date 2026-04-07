@@ -64,6 +64,7 @@ function generateSteps(array: number[]): Step[] {
         activeLine: 4,
         highlights: { comparing: [j, j + 1] },
         operations: { comparisons, swaps },
+        metadata: { i, j },
       });
 
       // If elements are in wrong order, swap them
@@ -76,6 +77,7 @@ function generateSteps(array: number[]): Step[] {
           activeLine: 5,
           highlights: { swapping: [j, j + 1] },
           operations: { comparisons, swaps },
+          metadata: { i, j },
         });
       }
     }
@@ -85,10 +87,11 @@ function generateSteps(array: number[]): Step[] {
     steps.push({
       array: [...arr],
       activeLine: 2,
-      highlights: { 
-        sorted: Array.from({ length: i + 1 }, (_, k) => n - 1 - k) 
+      highlights: {
+        sorted: Array.from({ length: i + 1 }, (_, k) => n - 1 - k)
       },
       operations: { comparisons, swaps },
+      metadata: { i },
     });
   }
 
@@ -110,4 +113,10 @@ export const bubbleSort: Algorithm = {
   name: 'Bubble Sort',
   generateSteps,
   code,
+  complexity: {
+    best: 'O(n)',
+    average: 'O(n²)',
+    worst: 'O(n²)',
+    space: 'O(1)',
+  },
 };
