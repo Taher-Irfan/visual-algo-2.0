@@ -4,8 +4,10 @@ import { selectionSort } from './selectionSort';
 import { insertionSort } from './insertionSort';
 import { quickSort } from './quickSort';
 import { mergeSort } from './mergeSort';
+import { heapSort } from './heapSort';
 import { linearSearch } from './linearSearch';
 import { binarySearch } from './binarySearch';
+import { jumpSearch } from './jumpSearch';
 
 // Legacy export for backward compatibility
 export const algorithms: Record<string, Algorithm> = {
@@ -14,8 +16,10 @@ export const algorithms: Record<string, Algorithm> = {
   insertion: insertionSort,
   quick: quickSort,
   merge: mergeSort,
+  heap: heapSort,
   linear: linearSearch,
   binary: binarySearch,
+  jump: jumpSearch,
 };
 
 // Re-export registry utilities

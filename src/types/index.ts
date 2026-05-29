@@ -32,6 +32,10 @@ export type Step = {
     r?: number;
     m?: number;
     k?: number;
+    // Heap sort state variables
+    heapSize?: number;
+    largest?: number;
+    phase?: 'build-heap' | 'sort-down';
   };
 };
 
@@ -88,6 +92,10 @@ export type GraphStep = {
     previous?: Record<string, string | null>;
     levels?: Record<string, number>;
     keys?: Record<string, number>;
+    // Kruskal's MST state
+    mstWeight?: number;
+    currentEdge?: { source: string; target: string; weight: number };
+    edgeList?: Array<{ source: string; target: string; weight: number; status: 'pending' | 'accepted' | 'rejected' }>;
   };
 };
 

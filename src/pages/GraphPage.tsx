@@ -498,6 +498,58 @@ function GraphPage() {
                         </div>
                       </div>
                     )}
+
+                    {/* Kruskal's: MST edge count + total weight */}
+                    {selectedAlgorithm === 'kruskal' && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">MST Edges</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.highlights.mstEdges?.length ?? 0} / {Math.max(0, currentStep.graph.nodes.length - 1)}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Total Weight</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {currentStep.metadata.mstWeight ?? 0}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Kruskal's: weight-sorted edge list with accept/reject status */}
+                    {selectedAlgorithm === 'kruskal' && currentStep.metadata.edgeList && (
+                      <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1.5 uppercase tracking-wide">
+                          Edges (sorted by weight)
+                        </span>
+                        <div className="text-xs font-mono text-slate-900 dark:text-white space-y-0.5">
+                          {currentStep.metadata.edgeList.map((e, i) => {
+                            const isCurrent =
+                              currentStep.metadata?.currentEdge?.source === e.source &&
+                              currentStep.metadata?.currentEdge?.target === e.target &&
+                              e.status === 'pending';
+                            const color =
+                              e.status === 'accepted'
+                                ? 'text-emerald-600 dark:text-emerald-400'
+                                : e.status === 'rejected'
+                                ? 'text-rose-500 dark:text-rose-400 line-through opacity-70'
+                                : isCurrent
+                                ? 'text-violet-600 dark:text-violet-400'
+                                : 'text-slate-500 dark:text-slate-400';
+                            return (
+                              <div key={`${e.source}-${e.target}-${i}`} className={`flex justify-between ${color}`}>
+                                <span>
+                                  {e.status === 'accepted' ? '✓ ' : e.status === 'rejected' ? '✗ ' : isCurrent ? '→ ' : '  '}
+                                  {e.source}—{e.target}
+                                </span>
+                                <span className="font-bold">w{e.weight}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

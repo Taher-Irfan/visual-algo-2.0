@@ -4,8 +4,10 @@ import { selectionSort } from './selectionSort';
 import { insertionSort } from './insertionSort';
 import { quickSort } from './quickSort';
 import { mergeSort } from './mergeSort';
+import { heapSort } from './heapSort';
 import { linearSearch } from './linearSearch';
 import { binarySearch } from './binarySearch';
+import { jumpSearch } from './jumpSearch';
 
 export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree';
 
@@ -45,10 +47,12 @@ export const algorithmRegistry: AlgorithmRegistry = {
     insertion: insertionSort,
     quick: quickSort,
     merge: mergeSort,
+    heap: heapSort,
   },
   searching: {
     linear: linearSearch,
     binary: binarySearch,
+    jump: jumpSearch,
   },
   graph: {
     // Placeholder for future implementations

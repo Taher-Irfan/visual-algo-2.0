@@ -136,6 +136,11 @@ function SortingPage() {
         if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
         if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
         break;
+      case 'heap':
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.largest !== undefined) items.push({ label: 'largest', value: meta.largest });
+        if (meta.heapSize !== undefined) items.push({ label: 'heapSize', value: meta.heapSize });
+        break;
     }
     return items.length > 0 ? items : undefined;
   })();

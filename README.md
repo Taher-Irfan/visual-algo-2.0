@@ -22,9 +22,9 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, and **g
 
 | Category   | Algorithms |
 |-----------|------------|
-| Sorting   | Bubble, Selection, Insertion, Quick, Merge |
-| Searching | Linear, Binary |
-| Graph     | BFS, DFS, Dijkstra, Prim |
+| Sorting   | Bubble, Selection, Insertion, Quick, Merge, Heap |
+| Searching | Linear, Binary, Jump |
+| Graph     | BFS, DFS, Dijkstra, Prim, Kruskal |
 
 ## Routes
 
@@ -33,9 +33,9 @@ The app uses React Router. Default entry redirects to Bubble Sort.
 | Path | Description |
 |------|-------------|
 | `/` | Redirects to `/sorting/bubble` |
-| `/sorting/:algorithm` | Sorting visualizer (`bubble`, `selection`, `insertion`, `quick`, `merge`) |
-| `/searching/:algorithm` | Searching visualizer (`linear`, `binary`) |
-| `/graph/:algorithm` | Graph visualizer (`bfs`, `dfs`, `dijkstra`, `prim`) |
+| `/sorting/:algorithm` | Sorting visualizer (`bubble`, `selection`, `insertion`, `quick`, `merge`, `heap`) |
+| `/searching/:algorithm` | Searching visualizer (`linear`, `binary`, `jump`) |
+| `/graph/:algorithm` | Graph visualizer (`bfs`, `dfs`, `dijkstra`, `prim`, `kruskal`) |
 
 Unknown paths fall back to `/sorting/bubble`.
 
@@ -74,7 +74,7 @@ npm run lint
 src/
 ├── algorithms/          # Algorithm definitions and step generators
 │   ├── registry.ts      # Sorting + searching registry
-│   ├── graphRegistry.ts # Graph algorithms (BFS, DFS, Dijkstra, Prim)
+│   ├── graphRegistry.ts # Graph algorithms (BFS, DFS, Dijkstra, Prim, Kruskal)
 │   └── *.ts             # Per-algorithm modules
 ├── components/          # UI (Visualizer, Navbar, ControlPanel, CodePanel, …)
 ├── pages/               # Route-level pages (Sorting, Searching, Graph)

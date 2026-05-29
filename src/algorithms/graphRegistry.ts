@@ -3,6 +3,7 @@ import bfsAlgorithm from './bfs';
 import dfsAlgorithm from './dfs';
 import dijkstraAlgorithm from './dijkstra';
 import primAlgorithm from './prim';
+import kruskalAlgorithm from './kruskal';
 
 export interface GraphAlgorithmRegistry {
   [algorithmId: string]: GraphAlgorithm;
@@ -13,6 +14,7 @@ export const graphAlgorithmRegistry: GraphAlgorithmRegistry = {
   dfs: dfsAlgorithm,
   dijkstra: dijkstraAlgorithm,
   prim: primAlgorithm,
+  kruskal: kruskalAlgorithm,
 };
 
 export function getGraphAlgorithm(algorithmId: string): GraphAlgorithm | undefined {
