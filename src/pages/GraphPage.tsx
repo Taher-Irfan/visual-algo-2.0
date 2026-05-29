@@ -213,7 +213,12 @@ function GraphPage() {
     if (selectedAlgorithm === 'bfs' && currentStep.metadata?.levels) {
       return currentStep.metadata.levels;
     }
-    if (selectedAlgorithm === 'dijkstra' && currentStep.metadata?.distances) {
+    if (
+      (selectedAlgorithm === 'dijkstra' ||
+        selectedAlgorithm === 'bellmanford' ||
+        selectedAlgorithm === 'floyd') &&
+      currentStep.metadata?.distances
+    ) {
       return currentStep.metadata.distances;
     }
     return undefined;
@@ -431,8 +436,8 @@ function GraphPage() {
                       </div>
                     )}
 
-                    {/* Dijkstra: Current node distance + parent */}
-                    {selectedAlgorithm === 'dijkstra' && currentStep.metadata.currentNode !== undefined && currentStep.metadata.distances && (
+                    {/* Dijkstra / Bellman-Ford: Current node distance + parent */}
+                    {(selectedAlgorithm === 'dijkstra' || selectedAlgorithm === 'bellmanford') && currentStep.metadata.currentNode !== undefined && currentStep.metadata.distances && (
                       <div className="grid grid-cols-2 gap-2">
                         <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
                           <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Dist(cur)</span>

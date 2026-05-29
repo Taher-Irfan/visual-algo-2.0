@@ -141,6 +141,27 @@ function SortingPage() {
         if (meta.largest !== undefined) items.push({ label: 'largest', value: meta.largest });
         if (meta.heapSize !== undefined) items.push({ label: 'heapSize', value: meta.heapSize });
         break;
+      case 'shell':
+        if (meta.gap !== undefined) items.push({ label: 'gap', value: meta.gap });
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        if (meta.key !== undefined) items.push({ label: 'temp', value: meta.key });
+        break;
+      case 'cocktail':
+      case 'gnome':
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        break;
+      case 'counting':
+        if (meta.i !== undefined) items.push({ label: 'idx', value: meta.i });
+        if (meta.key !== undefined) items.push({ label: 'value', value: meta.key });
+        break;
+      case 'radix':
+        if (meta.exp !== undefined) items.push({ label: 'exp', value: meta.exp });
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.digit !== undefined) items.push({ label: 'digit', value: meta.digit });
+        if (meta.key !== undefined) items.push({ label: 'value', value: meta.key });
+        break;
     }
     return items.length > 0 ? items : undefined;
   })();

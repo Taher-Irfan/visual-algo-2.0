@@ -5,9 +5,17 @@ import { insertionSort } from './insertionSort';
 import { quickSort } from './quickSort';
 import { mergeSort } from './mergeSort';
 import { heapSort } from './heapSort';
+import { shellSort } from './shellSort';
+import { cocktailSort } from './cocktailSort';
+import { gnomeSort } from './gnomeSort';
+import { countingSort } from './countingSort';
+import { radixSort } from './radixSort';
 import { linearSearch } from './linearSearch';
 import { binarySearch } from './binarySearch';
 import { jumpSearch } from './jumpSearch';
+import { exponentialSearch } from './exponentialSearch';
+import { ternarySearch } from './ternarySearch';
+import { interpolationSearch } from './interpolationSearch';
 
 export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree';
 
@@ -48,11 +56,19 @@ export const algorithmRegistry: AlgorithmRegistry = {
     quick: quickSort,
     merge: mergeSort,
     heap: heapSort,
+    shell: shellSort,
+    cocktail: cocktailSort,
+    gnome: gnomeSort,
+    counting: countingSort,
+    radix: radixSort,
   },
   searching: {
     linear: linearSearch,
     binary: binarySearch,
     jump: jumpSearch,
+    exponential: exponentialSearch,
+    ternary: ternarySearch,
+    interpolation: interpolationSearch,
   },
   graph: {
     // Placeholder for future implementations

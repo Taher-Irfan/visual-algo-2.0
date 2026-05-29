@@ -4,6 +4,8 @@ import dfsAlgorithm from './dfs';
 import dijkstraAlgorithm from './dijkstra';
 import primAlgorithm from './prim';
 import kruskalAlgorithm from './kruskal';
+import bellmanFordAlgorithm from './bellmanFord';
+import floydWarshallAlgorithm from './floydWarshall';
 
 export interface GraphAlgorithmRegistry {
   [algorithmId: string]: GraphAlgorithm;
@@ -15,6 +17,8 @@ export const graphAlgorithmRegistry: GraphAlgorithmRegistry = {
   dijkstra: dijkstraAlgorithm,
   prim: primAlgorithm,
   kruskal: kruskalAlgorithm,
+  bellmanford: bellmanFordAlgorithm,
+  floyd: floydWarshallAlgorithm,
 };
 
 export function getGraphAlgorithm(algorithmId: string): GraphAlgorithm | undefined {

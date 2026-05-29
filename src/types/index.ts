@@ -36,6 +36,10 @@ export type Step = {
     heapSize?: number;
     largest?: number;
     phase?: 'build-heap' | 'sort-down';
+    // Shell / Radix / Counting sort state variables
+    gap?: number;
+    exp?: number;
+    digit?: number;
   };
 };
 
