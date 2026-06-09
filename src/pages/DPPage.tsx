@@ -1,28 +1,27 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Shuffle } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import SegmentTreeVisualizer from '../components/SegmentTreeVisualizer';
+import DPVisualizer from '../components/DPVisualizer';
 import CodePanel from '../components/CodePanel';
 import PlaybackControls from '../components/PlaybackControls';
 import { getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms/registry';
-import { getSegmentTreeAlgorithm, getDefaultSegmentTreeAlgorithm } from '../algorithms/segmentTreeRegistry';
-import { generateRandomArray } from '../utils/array';
+import { getDPAlgorithm, getDefaultDPAlgorithm } from '../algorithms/dpRegistry';
 import { soundEngine } from '../utils/sound';
 import { useDarkMode, useSound } from '../hooks';
-import type { SegmentTreeStep } from '../types';
+import type { DPStep } from '../types';
 
-const EMPTY_STEP: SegmentTreeStep = {
-  nodes: [],
-  sourceArray: [],
+const EMPTY_STEP: DPStep = {
+  table: [],
+  rowLabels: [],
+  colLabels: [],
   activeLine: 0,
-  phase: 'build',
   highlights: {},
-  operations: { comparisons: 0, accesses: 0 },
+  operations: { cellsFilled: 0, comparisons: 0 },
 };
 
-function useSegmentTreePlayback() {
-  const [steps, setSteps] = useState<SegmentTreeStep[]>([]);
+function useDPPlayback() {
+  const [steps, setSteps] = useState<DPStep[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [playbackStatus, setPlaybackStatus] = useState<'idle' | 'playing' | 'paused' | 'finished'>('idle');
   const [playbackMode, setPlaybackMode] = useState<'continuous' | 'step'>('continuous');
@@ -32,7 +31,7 @@ function useSegmentTreePlayback() {
   const canStepForward = currentStepIndex < steps.length - 1;
   const canStepBackward = currentStepIndex > 0;
 
-  const loadSteps = useCallback((newSteps: SegmentTreeStep[]) => {
+  const loadSteps = useCallback((newSteps: DPStep[]) => {
     setSteps(newSteps);
     setCurrentStepIndex(0);
     setPlaybackStatus('idle');
@@ -98,16 +97,15 @@ function useSegmentTreePlayback() {
   };
 }
 
-function SegmentTreePage() {
+function DPPage() {
   const { algorithm: algorithmParam } = useParams<{ algorithm: string }>();
   const navigate = useNavigate();
 
-  const [category] = useState<AlgorithmCategory>('tree');
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState(algorithmParam || 'segment');
-  const [arraySize, setArraySize] = useState(8);
+  const [category] = useState<AlgorithmCategory>('dp');
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState(algorithmParam || getDefaultDPAlgorithm());
+  const [problemSize, setProblemSize] = useState(8);
   const [isDarkMode, setIsDarkMode] = useDarkMode();
   const [isSoundEnabled, setIsSoundEnabled] = useSound();
-  const prevPhaseRef = useRef<string>('');
 
   const {
     steps,
@@ -126,7 +124,7 @@ function SegmentTreePage() {
     replay,
     setPlaybackMode,
     setSpeed,
-  } = useSegmentTreePlayback();
+  } = useDPPlayback();
 
   useEffect(() => {
     if (algorithmParam && algorithmParam !== selectedAlgorithm) {
@@ -138,51 +136,48 @@ function SegmentTreePage() {
     soundEngine.initialize();
   }, []);
 
-  const handleGenerateArray = useCallback(() => {
-    const algorithm = getSegmentTreeAlgorithm(selectedAlgorithm);
+  const handleGenerateProblem = useCallback(() => {
+    const algorithm = getDPAlgorithm(selectedAlgorithm);
     if (algorithm) {
-      const newArray = generateRandomArray(arraySize);
-      loadSteps(algorithm.generateSteps(newArray));
+      loadSteps(algorithm.generateSteps(problemSize));
     }
-  }, [arraySize, selectedAlgorithm, loadSteps]);
+  }, [problemSize, selectedAlgorithm, loadSteps]);
 
   useEffect(() => {
-    handleGenerateArray();
+    handleGenerateProblem();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [arraySize, selectedAlgorithm]);
+  }, [problemSize, selectedAlgorithm]);
 
-  // Sound effects
+  // Sound effects driven by step highlights
   useEffect(() => {
     if (!isSoundEnabled || currentStepIndex === 0 || steps.length === 0) return;
-    const phase = currentStep.phase;
-    if (phase !== prevPhaseRef.current) {
-      prevPhaseRef.current = phase;
-      soundEngine.playVisit();
-    } else if (currentStep.highlights.inRange?.length) {
+    if (currentStep.highlights.result?.length) {
       soundEngine.playSuccess();
-    } else if (currentStep.highlights.active?.length) {
+    } else if (currentStep.highlights.sources?.length) {
       soundEngine.playCompare();
+    } else if (currentStep.highlights.current?.length) {
+      soundEngine.playVisit();
     }
-  }, [currentStepIndex, steps.length, currentStep, isSoundEnabled]);
+  }, [currentStepIndex, steps.length, currentStep.highlights, isSoundEnabled]);
 
   const handleCategoryChange = (newCategory: AlgorithmCategory) => {
     const defaultAlgo = getDefaultAlgorithm(newCategory);
     if (newCategory === 'sorting') navigate(`/sorting/${defaultAlgo}`);
     else if (newCategory === 'searching') navigate(`/searching/${defaultAlgo}`);
     else if (newCategory === 'graph') navigate(`/graph/${defaultAlgo}`);
-    else if (newCategory === 'tree') navigate(`/tree/${getDefaultSegmentTreeAlgorithm()}`);
-    else if (newCategory === 'dp') navigate(`/dp/${defaultAlgo}`);
+    else if (newCategory === 'tree') navigate('/tree/segment');
+    else if (newCategory === 'dp') navigate(`/dp/${getDefaultDPAlgorithm()}`);
   };
 
   const handleAlgorithmChange = (algo: string) => {
     setSelectedAlgorithm(algo);
-    navigate(`/tree/${algo}`);
+    navigate(`/dp/${algo}`);
   };
 
-  const algorithm = getSegmentTreeAlgorithm(selectedAlgorithm);
+  const algorithm = getDPAlgorithm(selectedAlgorithm);
   if (!algorithm) return <div>Algorithm not found</div>;
 
-  const { operations, phase, metadata } = currentStep;
+  const { operations, metadata } = currentStep;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 transition-colors">
@@ -202,11 +197,11 @@ function SegmentTreePage() {
 
           {/* Left: Visualizer + Playback */}
           <div className="lg:col-span-2 flex flex-col space-y-4 sm:space-y-6 lg:min-h-0 lg:overflow-y-auto">
-            <SegmentTreeVisualizer
-              nodes={currentStep.nodes}
-              sourceArray={currentStep.sourceArray}
+            <DPVisualizer
+              table={currentStep.table}
+              rowLabels={currentStep.rowLabels}
+              colLabels={currentStep.colLabels}
               highlights={currentStep.highlights}
-              phase={phase}
               metadata={metadata}
             />
 
@@ -233,23 +228,23 @@ function SegmentTreePage() {
               <div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Controls</h3>
                 <div className="space-y-5">
-                  {/* Array size */}
+                  {/* Problem size */}
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
                       <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Array Size
+                        Problem Size
                       </label>
                       <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 tabular-nums">
-                        {arraySize}
+                        {problemSize}
                       </span>
                     </div>
                     <input
                       type="range"
                       min="4"
-                      max="16"
+                      max="12"
                       step="1"
-                      value={arraySize}
-                      onChange={e => setArraySize(Number(e.target.value))}
+                      value={problemSize}
+                      onChange={e => setProblemSize(Number(e.target.value))}
                       disabled={playbackStatus === 'playing'}
                       className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
                     />
@@ -277,12 +272,12 @@ function SegmentTreePage() {
                   </div>
 
                   <button
-                    onClick={handleGenerateArray}
+                    onClick={handleGenerateProblem}
                     disabled={playbackStatus === 'playing'}
                     className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <Shuffle className="w-4 h-4" />
-                    <span>Generate New Array</span>
+                    <span>Generate New Problem</span>
                   </button>
                 </div>
               </div>
@@ -294,15 +289,15 @@ function SegmentTreePage() {
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Comparisons</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Cells Filled</span>
                     <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
-                      {operations.comparisons}
+                      {operations.cellsFilled}
                     </span>
                   </div>
                   <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Accesses</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Comparisons</span>
                     <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
-                      {operations.accesses}
+                      {operations.comparisons}
                     </span>
                   </div>
                 </div>
@@ -314,82 +309,81 @@ function SegmentTreePage() {
                   Algorithm State
                 </h4>
                 <div className="space-y-2">
-                  {/* Current phase */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Phase</span>
-                      <span className="text-sm font-mono font-bold text-slate-900 dark:text-white capitalize">
-                        {phase}
-                      </span>
-                    </div>
                     <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
                       <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Step</span>
                       <span className="text-sm font-mono font-bold text-slate-900 dark:text-white tabular-nums">
                         {currentStepIndex + 1} / {steps.length}
                       </span>
                     </div>
+                    <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Cell</span>
+                      <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                        {metadata?.i !== undefined && metadata?.j !== undefined
+                          ? `[${metadata.i}, ${metadata.j}]`
+                          : metadata?.i !== undefined
+                          ? `[${metadata.i}]`
+                          : '—'}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Query info */}
-                  {phase === 'query' && metadata?.queryRange && (
-                    <>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Query L</span>
-                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">{metadata.queryRange[0]}</span>
-                        </div>
-                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Query R</span>
-                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">{metadata.queryRange[1]}</span>
-                        </div>
-                      </div>
-                      {metadata.queryResult !== undefined && (
-                        <div className="px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
-                          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wide block mb-0.5">Result</span>
-                          <span className="text-sm font-mono font-bold text-emerald-700 dark:text-emerald-300">{metadata.queryResult}</span>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* Update info */}
-                  {phase === 'update' && metadata?.updateIndex !== undefined && (
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Index</span>
-                        <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">{metadata.updateIndex}</span>
-                      </div>
-                      <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">New Val</span>
-                        <span className="text-sm font-mono font-bold text-violet-700 dark:text-violet-300">{metadata.updateValue}</span>
+                  {/* Problem inputs */}
+                  {(metadata?.inputA || metadata?.inputArray || metadata?.weights) && (
+                    <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1.5 uppercase tracking-wide">
+                        Problem Input
+                      </span>
+                      <div className="text-xs font-mono text-slate-900 dark:text-white space-y-0.5">
+                        {metadata.inputA && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-500 dark:text-slate-400">String A</span>
+                            <span className="font-bold">{metadata.inputA}</span>
+                          </div>
+                        )}
+                        {metadata.inputB && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-500 dark:text-slate-400">String B</span>
+                            <span className="font-bold">{metadata.inputB}</span>
+                          </div>
+                        )}
+                        {metadata.inputArray && (
+                          <div className="flex justify-between gap-2">
+                            <span className="text-slate-500 dark:text-slate-400 shrink-0">Array</span>
+                            <span className="font-bold text-right">[{metadata.inputArray.join(', ')}]</span>
+                          </div>
+                        )}
+                        {metadata.weights && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-500 dark:text-slate-400">Weights</span>
+                            <span className="font-bold">[{metadata.weights.join(', ')}]</span>
+                          </div>
+                        )}
+                        {metadata.values && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-500 dark:text-slate-400">Values</span>
+                            <span className="font-bold">[{metadata.values.join(', ')}]</span>
+                          </div>
+                        )}
+                        {metadata.capacity !== undefined && (
+                          <div className="flex justify-between">
+                            <span className="text-slate-500 dark:text-slate-400">Capacity</span>
+                            <span className="font-bold">{metadata.capacity}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
 
-                  {/* Complexity info */}
-                  <div className="mt-1">
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wide">
-                      Complexity
-                    </span>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
-                        <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Build</div>
-                        <div className="text-sm font-mono font-semibold text-emerald-600 dark:text-emerald-400">O(n)</div>
-                      </div>
-                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
-                        <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Query</div>
-                        <div className="text-sm font-mono font-semibold text-amber-600 dark:text-amber-400">O(log n)</div>
-                      </div>
-                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
-                        <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Update</div>
-                        <div className="text-sm font-mono font-semibold text-red-600 dark:text-red-400">O(log n)</div>
-                      </div>
-                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg px-3 py-2">
-                        <div className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Space</div>
-                        <div className="text-sm font-mono font-semibold text-blue-600 dark:text-blue-400">O(n)</div>
-                      </div>
+                  {/* Final result */}
+                  {metadata?.finalResult !== undefined && (
+                    <div className="px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
+                      <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wide block mb-0.5">Result</span>
+                      <span className="text-sm font-mono font-bold text-emerald-700 dark:text-emerald-300">
+                        {metadata.finalResult}
+                      </span>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -397,6 +391,7 @@ function SegmentTreePage() {
             <CodePanel
               code={algorithm.code}
               activeLine={currentStep.activeLine}
+              complexity={algorithm.complexity}
             />
           </div>
         </div>
@@ -405,4 +400,4 @@ function SegmentTreePage() {
   );
 }
 
-export default SegmentTreePage;
+export default DPPage;

@@ -92,6 +92,8 @@ function SortingPage() {
       navigate(`/graph/${defaultAlgo}`);
     } else if (newCategory === 'tree') {
       navigate('/tree/segment');
+    } else if (newCategory === 'dp') {
+      navigate(`/dp/${defaultAlgo}`);
     }
   };
 
@@ -161,6 +163,24 @@ function SortingPage() {
         if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
         if (meta.digit !== undefined) items.push({ label: 'digit', value: meta.digit });
         if (meta.key !== undefined) items.push({ label: 'value', value: meta.key });
+        break;
+      case 'comb':
+        if (meta.gap !== undefined) items.push({ label: 'gap', value: meta.gap });
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
+        break;
+      case 'cycle':
+        if (meta.i !== undefined) items.push({ label: 'cycleStart', value: meta.i });
+        if (meta.minIdx !== undefined) items.push({ label: 'pos', value: meta.minIdx });
+        if (meta.key !== undefined) items.push({ label: 'item', value: meta.key });
+        break;
+      case 'pancake':
+        if (meta.i !== undefined) items.push({ label: 'end', value: meta.i });
+        if (meta.m !== undefined) items.push({ label: 'maxIdx', value: meta.m });
+        break;
+      case 'oddeven':
+        if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
         break;
     }
     return items.length > 0 ? items : undefined;

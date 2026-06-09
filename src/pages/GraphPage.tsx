@@ -194,6 +194,8 @@ function GraphPage() {
       navigate(`/graph/${graphDefaultAlgo}`);
     } else if (newCategory === 'tree') {
       navigate('/tree/segment');
+    } else if (newCategory === 'dp') {
+      navigate(`/dp/${defaultAlgo}`);
     }
   };
 
@@ -216,7 +218,8 @@ function GraphPage() {
     if (
       (selectedAlgorithm === 'dijkstra' ||
         selectedAlgorithm === 'bellmanford' ||
-        selectedAlgorithm === 'floyd') &&
+        selectedAlgorithm === 'floyd' ||
+        selectedAlgorithm === 'astar') &&
       currentStep.metadata?.distances
     ) {
       return currentStep.metadata.distances;
@@ -436,8 +439,30 @@ function GraphPage() {
                       </div>
                     )}
 
-                    {/* Dijkstra / Bellman-Ford: Current node distance + parent */}
-                    {(selectedAlgorithm === 'dijkstra' || selectedAlgorithm === 'bellmanford') && currentStep.metadata.currentNode !== undefined && currentStep.metadata.distances && (
+                    {/* A*: target node + f-score of the current node */}
+                    {selectedAlgorithm === 'astar' && currentStep.metadata.targetNode !== undefined && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Target</span>
+                          <span className="text-sm font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            Node {currentStep.metadata.targetNode}
+                          </span>
+                        </div>
+                        <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">f(cur) = g + h</span>
+                          <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
+                            {(() => {
+                              const cur = currentStep.metadata?.currentNode;
+                              const f = cur !== undefined ? currentStep.metadata?.fScores?.[cur] : undefined;
+                              return f === undefined || f === Infinity ? '—' : f;
+                            })()}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Dijkstra / Bellman-Ford / A*: Current node distance + parent */}
+                    {(selectedAlgorithm === 'dijkstra' || selectedAlgorithm === 'bellmanford' || selectedAlgorithm === 'astar') && currentStep.metadata.currentNode !== undefined && currentStep.metadata.distances && (
                       <div className="grid grid-cols-2 gap-2">
                         <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
                           <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Dist(cur)</span>

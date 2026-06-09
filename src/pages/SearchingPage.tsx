@@ -91,6 +91,8 @@ function SearchingPage() {
       navigate(`/graph/${defaultAlgo}`);
     } else if (newCategory === 'tree') {
       navigate('/tree/segment');
+    } else if (newCategory === 'dp') {
+      navigate(`/dp/${defaultAlgo}`);
     }
   };
 

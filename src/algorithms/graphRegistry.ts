@@ -6,6 +6,7 @@ import primAlgorithm from './prim';
 import kruskalAlgorithm from './kruskal';
 import bellmanFordAlgorithm from './bellmanFord';
 import floydWarshallAlgorithm from './floydWarshall';
+import aStarAlgorithm from './aStar';
 
 export interface GraphAlgorithmRegistry {
   [algorithmId: string]: GraphAlgorithm;
@@ -19,6 +20,7 @@ export const graphAlgorithmRegistry: GraphAlgorithmRegistry = {
   kruskal: kruskalAlgorithm,
   bellmanford: bellmanFordAlgorithm,
   floyd: floydWarshallAlgorithm,
+  astar: aStarAlgorithm,
 };
 
 export function getGraphAlgorithm(algorithmId: string): GraphAlgorithm | undefined {

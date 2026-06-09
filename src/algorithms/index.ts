@@ -10,12 +10,17 @@ import { cocktailSort } from './cocktailSort';
 import { gnomeSort } from './gnomeSort';
 import { countingSort } from './countingSort';
 import { radixSort } from './radixSort';
+import { combSort } from './combSort';
+import { cycleSort } from './cycleSort';
+import { pancakeSort } from './pancakeSort';
+import { oddEvenSort } from './oddEvenSort';
 import { linearSearch } from './linearSearch';
 import { binarySearch } from './binarySearch';
 import { jumpSearch } from './jumpSearch';
 import { exponentialSearch } from './exponentialSearch';
 import { ternarySearch } from './ternarySearch';
 import { interpolationSearch } from './interpolationSearch';
+import { fibonacciSearch } from './fibonacciSearch';
 
 // Legacy export for backward compatibility
 export const algorithms: Record<string, Algorithm> = {
@@ -30,12 +35,17 @@ export const algorithms: Record<string, Algorithm> = {
   gnome: gnomeSort,
   counting: countingSort,
   radix: radixSort,
+  comb: combSort,
+  cycle: cycleSort,
+  pancake: pancakeSort,
+  oddeven: oddEvenSort,
   linear: linearSearch,
   binary: binarySearch,
   jump: jumpSearch,
   exponential: exponentialSearch,
   ternary: ternarySearch,
   interpolation: interpolationSearch,
+  fibonacci: fibonacciSearch,
 };
 
 // Re-export registry utilities

@@ -100,6 +100,9 @@ export type GraphStep = {
     mstWeight?: number;
     currentEdge?: { source: string; target: string; weight: number };
     edgeList?: Array<{ source: string; target: string; weight: number; status: 'pending' | 'accepted' | 'rejected' }>;
+    // A* pathfinding state
+    targetNode?: string;
+    fScores?: Record<string, number>;
   };
 };
 
@@ -147,6 +150,49 @@ export type SegmentTreeAlgorithm = {
   name: string;
   generateSteps: (array: number[]) => SegmentTreeStep[];
   code: string;
+};
+
+export type DPStep = {
+  /** DP table snapshot; null = not yet computed */
+  table: (number | null)[][];
+  /** Label for each row (rendered left of the grid) */
+  rowLabels: string[];
+  /** Label for each column (rendered above the grid) */
+  colLabels: string[];
+  activeLine: number;
+  highlights: {
+    /** Cell(s) currently being computed [row, col] */
+    current?: Array<[number, number]>;
+    /** Cell(s) being read to compute the current cell */
+    sources?: Array<[number, number]>;
+    /** Cells on the final solution / traceback path */
+    result?: Array<[number, number]>;
+  };
+  metadata?: {
+    description?: string;
+    inputA?: string;
+    inputB?: string;
+    inputArray?: number[];
+    weights?: number[];
+    values?: number[];
+    capacity?: number;
+    i?: number;
+    j?: number;
+    finalResult?: number | string;
+  };
+  operations: {
+    cellsFilled: number;
+    comparisons: number;
+  };
+};
+
+export type DPAlgorithm = {
+  id: string;
+  name: string;
+  /** size steers the randomly generated problem instance */
+  generateSteps: (size: number) => DPStep[];
+  code: string;
+  complexity?: Complexity;
 };
 
 export type PlaybackMode = 'continuous' | 'step';

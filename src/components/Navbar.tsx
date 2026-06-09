@@ -3,6 +3,7 @@ import type { AlgorithmCategory } from '../algorithms/registry';
 import { getAlgorithmOptions } from '../algorithms/registry';
 import { getGraphAlgorithmOptions } from '../algorithms/graphRegistry';
 import { getSegmentTreeAlgorithmOptions } from '../algorithms/segmentTreeRegistry';
+import { getDPAlgorithmOptions } from '../algorithms/dpRegistry';
 
 interface NavbarProps {
   category: AlgorithmCategory;
@@ -20,6 +21,7 @@ const CATEGORIES = [
   { id: 'searching' as AlgorithmCategory, name: 'Searching' },
   { id: 'graph' as AlgorithmCategory, name: 'Graph' },
   { id: 'tree' as AlgorithmCategory, name: 'Tree' },
+  { id: 'dp' as AlgorithmCategory, name: 'DP' },
 ];
 
 export default function Navbar({
@@ -37,6 +39,8 @@ export default function Navbar({
       ? getGraphAlgorithmOptions()
       : category === 'tree'
       ? getSegmentTreeAlgorithmOptions()
+      : category === 'dp'
+      ? getDPAlgorithmOptions()
       : getAlgorithmOptions(category);
 
   const categoryButtons = CATEGORIES.map((cat) => (

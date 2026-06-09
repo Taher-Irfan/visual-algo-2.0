@@ -1,6 +1,6 @@
 # VisualAlgo
 
-Interactive, step-by-step visualizations for **sorting**, **searching**, and **graph** algorithms. Built with React, TypeScript, Vite, and Tailwind CSS.
+Interactive, step-by-step visualizations for **sorting**, **searching**, **graph**, **tree**, and **dynamic programming** algorithms. Built with React, TypeScript, Vite, and Tailwind CSS.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
@@ -9,8 +9,9 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, and **g
 ## Features
 
 - **Sorting** — Animated bar charts with comparisons, swaps, and sorted regions
-- **Searching** — Linear and binary search with range and target highlighting
-- **Graph** — Node–edge diagrams for traversal and shortest-path style algorithms
+- **Searching** — Range and target highlighting across six search strategies
+- **Graph** — Node–edge diagrams for traversal, shortest-path, MST, and A* pathfinding
+- **Dynamic Programming** — Animated DP tables with cell dependencies and solution traceback
 - **Playback** — Continuous auto-play with speed control, or manual step mode
 - **Code panel** — Reference implementation with line highlighting synced to each step
 - **Stats** — Live comparison and swap (or operation) counts where applicable
@@ -22,9 +23,11 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, and **g
 
 | Category   | Algorithms |
 |-----------|------------|
-| Sorting   | Bubble, Selection, Insertion, Quick, Merge, Heap, Shell, Cocktail Shaker, Gnome, Counting, Radix |
-| Searching | Linear, Binary, Jump, Exponential, Ternary, Interpolation |
-| Graph     | BFS, DFS, Dijkstra, Prim, Kruskal, Bellman-Ford, Floyd-Warshall |
+| Sorting   | Bubble, Selection, Insertion, Quick, Merge, Heap, Shell, Cocktail Shaker, Gnome, Counting, Radix, Comb, Cycle, Pancake, Odd-Even |
+| Searching | Linear, Binary, Jump, Exponential, Ternary, Interpolation, Fibonacci |
+| Graph     | BFS, DFS, Dijkstra, Prim, Kruskal, Bellman-Ford, Floyd-Warshall, A* |
+| Tree      | Segment Tree (build, query, update) |
+| DP        | Longest Common Subsequence, 0/1 Knapsack, Longest Increasing Subsequence, Fibonacci |
 
 ## Routes
 
@@ -33,9 +36,11 @@ The app uses React Router. Default entry redirects to Bubble Sort.
 | Path | Description |
 |------|-------------|
 | `/` | Redirects to `/sorting/bubble` |
-| `/sorting/:algorithm` | Sorting visualizer (`bubble`, `selection`, `insertion`, `quick`, `merge`, `heap`, `shell`, `cocktail`, `gnome`, `counting`, `radix`) |
-| `/searching/:algorithm` | Searching visualizer (`linear`, `binary`, `jump`, `exponential`, `ternary`, `interpolation`) |
-| `/graph/:algorithm` | Graph visualizer (`bfs`, `dfs`, `dijkstra`, `prim`, `kruskal`, `bellmanford`, `floyd`) |
+| `/sorting/:algorithm` | Sorting visualizer (`bubble`, `selection`, `insertion`, `quick`, `merge`, `heap`, `shell`, `cocktail`, `gnome`, `counting`, `radix`, `comb`, `cycle`, `pancake`, `oddeven`) |
+| `/searching/:algorithm` | Searching visualizer (`linear`, `binary`, `jump`, `exponential`, `ternary`, `interpolation`, `fibonacci`) |
+| `/graph/:algorithm` | Graph visualizer (`bfs`, `dfs`, `dijkstra`, `prim`, `kruskal`, `bellmanford`, `floyd`, `astar`) |
+| `/tree/:algorithm` | Segment tree visualizer (`segment`) |
+| `/dp/:algorithm` | DP table visualizer (`lcs`, `knapsack`, `lis`, `fib`) |
 
 Unknown paths fall back to `/sorting/bubble`.
 
@@ -74,10 +79,11 @@ npm run lint
 src/
 ├── algorithms/          # Algorithm definitions and step generators
 │   ├── registry.ts      # Sorting + searching registry
-│   ├── graphRegistry.ts # Graph algorithms (BFS, DFS, Dijkstra, Prim, Kruskal, Bellman-Ford, Floyd-Warshall)
+│   ├── graphRegistry.ts # Graph algorithms (BFS, DFS, Dijkstra, Prim, Kruskal, Bellman-Ford, Floyd-Warshall, A*)
+│   ├── dpRegistry.ts    # Dynamic programming algorithms (LCS, Knapsack, LIS, Fibonacci)
 │   └── *.ts             # Per-algorithm modules
 ├── components/          # UI (Visualizer, Navbar, ControlPanel, CodePanel, …)
-├── pages/               # Route-level pages (Sorting, Searching, Graph)
+├── pages/               # Route-level pages (Sorting, Searching, Graph, SegmentTree, DP)
 ├── hooks/               # e.g. playback, dark mode
 ├── types/               # Shared TypeScript types (Step, Graph, …)
 ├── utils/               # Helpers (array, graph, sound)
@@ -94,7 +100,7 @@ Algorithms **precompute steps** before playback:
 2. The UI advances the current step index in continuous or step mode.
 3. Highlights and the code panel stay in sync with the active step.
 
-Sorting and searching share the `Algorithm` + `Step` model; graph algorithms use `GraphAlgorithm` + `GraphStep` and a separate registry.
+Sorting and searching share the `Algorithm` + `Step` model; graph algorithms use `GraphAlgorithm` + `GraphStep`; DP algorithms use `DPAlgorithm` + `DPStep` (table snapshots with cell highlights). Each family has its own registry.
 
 ## Extending the project
 
@@ -109,6 +115,12 @@ Sorting and searching share the `Algorithm` + `Step` model; graph algorithms use
 1. Add a module implementing `GraphAlgorithm`.
 2. Register it in `src/algorithms/graphRegistry.ts`.
 3. Use `/graph/your-id`.
+
+**New DP algorithm**
+
+1. Add a module implementing `DPAlgorithm` (`generateSteps(size)` returns `DPStep[]` table snapshots).
+2. Register it in `src/algorithms/dpRegistry.ts`.
+3. Use `/dp/your-id`.
 
 ## Contributing
 

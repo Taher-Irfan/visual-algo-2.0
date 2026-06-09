@@ -10,14 +10,19 @@ import { cocktailSort } from './cocktailSort';
 import { gnomeSort } from './gnomeSort';
 import { countingSort } from './countingSort';
 import { radixSort } from './radixSort';
+import { combSort } from './combSort';
+import { cycleSort } from './cycleSort';
+import { pancakeSort } from './pancakeSort';
+import { oddEvenSort } from './oddEvenSort';
 import { linearSearch } from './linearSearch';
 import { binarySearch } from './binarySearch';
 import { jumpSearch } from './jumpSearch';
 import { exponentialSearch } from './exponentialSearch';
 import { ternarySearch } from './ternarySearch';
 import { interpolationSearch } from './interpolationSearch';
+import { fibonacciSearch } from './fibonacciSearch';
 
-export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree';
+export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree' | 'dp';
 
 export interface CategoryAlgorithms {
   [algorithmId: string]: Algorithm;
@@ -61,6 +66,10 @@ export const algorithmRegistry: AlgorithmRegistry = {
     gnome: gnomeSort,
     counting: countingSort,
     radix: radixSort,
+    comb: combSort,
+    cycle: cycleSort,
+    pancake: pancakeSort,
+    oddeven: oddEvenSort,
   },
   searching: {
     linear: linearSearch,
@@ -69,6 +78,7 @@ export const algorithmRegistry: AlgorithmRegistry = {
     exponential: exponentialSearch,
     ternary: ternarySearch,
     interpolation: interpolationSearch,
+    fibonacci: fibonacciSearch,
   },
   graph: {
     // Placeholder for future implementations
@@ -118,6 +128,7 @@ export function getDefaultAlgorithm(category: AlgorithmCategory): string {
     searching: 'linear',
     graph: 'bfs',
     tree: 'segment',
+    dp: 'lcs',
   };
   return defaultMap[category] || 'bubble';
 }
