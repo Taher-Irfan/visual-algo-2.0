@@ -285,6 +285,46 @@ export type BoardAlgorithm = {
   complexity?: Complexity;
 };
 
+export type GeoPoint = {
+  x: number;
+  y: number;
+};
+
+export type GeometryStep = {
+  /** The fixed point set the algorithm operates on */
+  points: GeoPoint[];
+  /** Indices of points forming the current hull chain, in order */
+  hull: number[];
+  /** True once the hull polygon is complete (closes the polyline) */
+  closed?: boolean;
+  activeLine: number;
+  highlights: {
+    /** Point currently being processed (amber) */
+    current?: number[];
+    /** Candidate point under comparison (violet) */
+    candidate?: number[];
+    /** Points popped/rejected from the hull (rose, faded) */
+    rejected?: number[];
+  };
+  metadata?: {
+    description?: string;
+    pivot?: number;
+  };
+  operations: {
+    comparisons: number;
+    hullSize: number;
+  };
+};
+
+export type GeometryAlgorithm = {
+  id: string;
+  name: string;
+  /** size steers the number of randomly generated points */
+  generateSteps: (size: number) => GeometryStep[];
+  code: string;
+  complexity?: Complexity;
+};
+
 export type PlaybackMode = 'continuous' | 'step';
 
 export type PlaybackStatus = 'idle' | 'playing' | 'paused' | 'finished';

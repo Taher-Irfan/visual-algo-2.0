@@ -22,7 +22,17 @@ import { ternarySearch } from './ternarySearch';
 import { interpolationSearch } from './interpolationSearch';
 import { fibonacciSearch } from './fibonacciSearch';
 
-export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree' | 'dp' | 'strings' | 'puzzles' | 'race';
+export type AlgorithmCategory =
+  | 'sorting'
+  | 'searching'
+  | 'graph'
+  | 'tree'
+  | 'dp'
+  | 'strings'
+  | 'puzzles'
+  | 'pathfinding'
+  | 'geometry'
+  | 'race';
 
 export interface CategoryAlgorithms {
   [algorithmId: string]: Algorithm;
@@ -131,6 +141,8 @@ export function getDefaultAlgorithm(category: AlgorithmCategory): string {
     dp: 'lcs',
     strings: 'kmp',
     puzzles: 'queens',
+    pathfinding: 'bfs',
+    geometry: 'graham',
     race: '',
   };
   return defaultMap[category] || 'bubble';

@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Play, Pause, RotateCcw, Trophy } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Play, Pause, RotateCcw, Trophy, Share2, Check } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { getCategoryRoute, getAlgorithmsByCategory, type AlgorithmCategory } from '../algorithms/registry';
-import { generateRandomArray } from '../utils/array';
-import { SITE_NAME } from '../utils/seo';
+import { generateSeededArray } from '../utils/array';
+import { SITE_NAME, SITE_URL } from '../utils/seo';
 import { useDarkMode, useSound, useSeo } from '../hooks';
 import type { Step } from '../types';
 
@@ -49,15 +49,36 @@ function MiniBars({ step, finished }: { step: Step; finished: boolean }) {
 
 function RacePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [isDarkMode, setIsDarkMode] = useDarkMode();
   const [isSoundEnabled, setIsSoundEnabled] = useSound();
-  const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_SELECTION);
-  const [arraySize, setArraySize] = useState(40);
+
+  // A shared link preloads competitors, array size, and the exact array seed
+  const validSortIds = useMemo(
+    () => new Set(Object.keys(getAlgorithmsByCategory('sorting'))),
+    []
+  );
+  const [selectedIds, setSelectedIds] = useState<string[]>(() => {
+    const fromUrl = searchParams.get('algos')?.split(',').filter(id => validSortIds.has(id)) ?? [];
+    return fromUrl.length >= MIN_LANES ? fromUrl.slice(0, MAX_LANES) : DEFAULT_SELECTION;
+  });
+  const [arraySize, setArraySize] = useState(() => {
+    const fromUrl = Number(searchParams.get('size'));
+    return Number.isFinite(fromUrl) && fromUrl >= 10 && fromUrl <= 60 ? Math.round(fromUrl / 5) * 5 : 40;
+  });
+  const pendingSeedRef = useRef<number | null>(
+    /^\d+$/.test(searchParams.get('seed') ?? '') ? Number(searchParams.get('seed')) : null
+  );
+  // Mirrors whether a shared seed is waiting; refs must not be read in render
+  const [isSharedRace, setIsSharedRace] = useState(() => /^\d+$/.test(searchParams.get('seed') ?? ''));
+
   const [speed, setSpeed] = useState(5);
   const [status, setStatus] = useState<RaceStatus>('idle');
   const [lanes, setLanes] = useState<Lane[]>([]);
   const [tick, setTick] = useState(0);
+  const [lastSeed, setLastSeed] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useSeo({
     title: `Sorting Algorithm Race – Compare Algorithms Side by Side | ${SITE_NAME}`,
@@ -78,7 +99,14 @@ function RacePage() {
   };
 
   const startRace = useCallback(() => {
-    const array = generateRandomArray(arraySize);
+    // A pending seed (from a shared link) reproduces the exact same race once
+    const seed = pendingSeedRef.current ?? Math.floor(Math.random() * 1_000_000_000);
+    pendingSeedRef.current = null;
+    setIsSharedRace(false);
+    setLastSeed(seed);
+    setCopied(false);
+
+    const array = generateSeededArray(arraySize, seed);
     const newLanes: Lane[] = selectedIds
       .map(id => sortingAlgorithms.find(a => a.id === id))
       .filter((a): a is NonNullable<typeof a> => a !== undefined)
@@ -96,7 +124,18 @@ function RacePage() {
     setStatus('idle');
     setLanes([]);
     setTick(0);
+    setLastSeed(null);
+    setCopied(false);
   };
+
+  const shareRace = useCallback(() => {
+    if (lastSeed === null) return;
+    const url = `${SITE_URL}/race?algos=${selectedIds.join(',')}&size=${arraySize}&seed=${lastSeed}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }, [lastSeed, selectedIds, arraySize]);
 
   const maxSteps = useMemo(
     () => lanes.reduce((mx, lane) => Math.max(mx, lane.steps.length), 0),
@@ -193,8 +232,27 @@ function RacePage() {
                 <RotateCcw className="w-4 h-4" />
                 <span>Reset</span>
               </button>
+              <button
+                onClick={shareRace}
+                disabled={lastSeed === null}
+                className="flex items-center space-x-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Copy a shareable link that replays this exact race"
+              >
+                {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Share2 className="w-4 h-4" />}
+                <span>{copied ? 'Link Copied!' : 'Share Race'}</span>
+              </button>
             </div>
           </div>
+
+          {/* Shared-race banner */}
+          {isSharedRace && status === 'idle' && lanes.length === 0 && (
+            <div className="flex items-center space-x-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+              <Share2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                Shared race loaded — press Start Race to replay the exact same array and competitors.
+              </span>
+            </div>
+          )}
 
           {/* Competitor chips */}
           <div>

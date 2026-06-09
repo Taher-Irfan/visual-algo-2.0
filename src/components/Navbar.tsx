@@ -6,6 +6,8 @@ import { getSegmentTreeAlgorithmOptions } from '../algorithms/segmentTreeRegistr
 import { getDPAlgorithmOptions } from '../algorithms/dpRegistry';
 import { getStringAlgorithmOptions } from '../algorithms/stringRegistry';
 import { getPuzzleAlgorithmOptions } from '../algorithms/puzzleRegistry';
+import { getGridAlgorithmOptions } from '../algorithms/gridPathfinding';
+import { getGeometryAlgorithmOptions } from '../algorithms/geometryRegistry';
 
 interface NavbarProps {
   category: AlgorithmCategory;
@@ -26,6 +28,8 @@ const CATEGORIES = [
   { id: 'dp' as AlgorithmCategory, name: 'DP' },
   { id: 'strings' as AlgorithmCategory, name: 'Strings' },
   { id: 'puzzles' as AlgorithmCategory, name: 'Puzzles' },
+  { id: 'pathfinding' as AlgorithmCategory, name: 'Pathfinding' },
+  { id: 'geometry' as AlgorithmCategory, name: 'Geometry' },
   { id: 'race' as AlgorithmCategory, name: 'Race' },
 ];
 
@@ -50,6 +54,10 @@ export default function Navbar({
       ? getStringAlgorithmOptions()
       : category === 'puzzles'
       ? getPuzzleAlgorithmOptions()
+      : category === 'pathfinding'
+      ? getGridAlgorithmOptions()
+      : category === 'geometry'
+      ? getGeometryAlgorithmOptions()
       : category === 'race'
       ? []
       : getAlgorithmOptions(category);

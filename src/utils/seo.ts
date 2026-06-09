@@ -72,6 +72,14 @@ const DESCRIPTIONS: Record<string, string> = {
   'puzzles/queens': 'Watch N-Queens backtracking place queens row by row, detect attacks, and retreat from dead ends. Interactive chessboard animation up to 8×8.',
   'puzzles/sudoku': 'See a Sudoku solver try digits, hit contradictions, and backtrack on a freshly generated puzzle. Step-by-step 9×9 constraint-solving animation.',
   'puzzles/knight': "Follow a knight visiting every square exactly once, guided by Warnsdorff's fewest-exits rule. Interactive Knight's Tour animation.",
+  // Pathfinding playground
+  'pathfinding/bfs': 'Draw walls on an interactive grid and watch BFS flood outward to find the guaranteed shortest path. Includes maze generation and draggable endpoints.',
+  'pathfinding/dfs': 'See DFS dive down corridors of your hand-drawn maze — and how far from optimal its path can be. Interactive grid with walls and maze generation.',
+  'pathfinding/greedy': 'Watch Greedy Best-First chase the target by straight-line distance on a grid you design — fast, but easily fooled by walls. Interactive maze playground.',
+  'pathfinding/astar': 'Draw a maze and watch A* combine path cost with a distance heuristic to find the shortest path while exploring far fewer cells than BFS.',
+  // Geometry
+  'geometry/graham': 'Watch Graham Scan sort points by polar angle and pop right turns off the stack to build the convex hull. Interactive computational geometry animation.',
+  'geometry/jarvis': 'See Jarvis March wrap a string around a point cloud, locking in one hull point per round. Interactive gift-wrapping convex hull animation.',
 };
 
 const CATEGORY_LABELS: Record<AlgorithmCategory, string> = {
@@ -82,6 +90,8 @@ const CATEGORY_LABELS: Record<AlgorithmCategory, string> = {
   dp: 'Dynamic Programming',
   strings: 'String Algorithm',
   puzzles: 'Backtracking Puzzle',
+  pathfinding: 'Pathfinding Grid',
+  geometry: 'Computational Geometry',
   race: 'Algorithm Race',
 };
 

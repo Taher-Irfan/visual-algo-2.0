@@ -14,7 +14,9 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, **graph
 - **Dynamic Programming** — Animated DP tables with cell dependencies and solution traceback
 - **Strings** — Pattern matching with aligned pattern rows, failure tables, and rolling hashes
 - **Puzzles** — Backtracking on chess boards and Sudoku grids with conflict and retreat animation
-- **Race Mode** — Run up to six sorting algorithms head-to-head on the same array with live standings
+- **Pathfinding Playground** — Draw walls, drag endpoints, generate mazes, and watch BFS/DFS/Greedy/A* flood the grid
+- **Geometry** — Convex hull construction over animated point clouds
+- **Race Mode** — Run up to six sorting algorithms head-to-head on the same array with live standings and shareable replay links
 - **Playback** — Continuous auto-play with speed control, or manual step mode
 - **Code panel** — Reference implementation with line highlighting synced to each step
 - **Stats** — Live comparison and swap (or operation) counts where applicable
@@ -33,7 +35,9 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, **graph
 | DP        | Longest Common Subsequence, 0/1 Knapsack, Longest Increasing Subsequence, Fibonacci |
 | Strings   | KMP, Rabin-Karp, Z-Algorithm, Longest Palindromic Substring |
 | Puzzles   | N-Queens, Sudoku Solver, Knight's Tour |
-| Race      | Any 2–6 sorting algorithms head-to-head |
+| Pathfinding | BFS, DFS, Greedy Best-First, A* on an interactive wall/maze grid |
+| Geometry  | Graham Scan, Jarvis March (convex hull) |
+| Race      | Any 2–6 sorting algorithms head-to-head, shareable via seeded links |
 
 ## Routes
 
@@ -49,7 +53,9 @@ The app uses React Router. Default entry redirects to Bubble Sort.
 | `/dp/:algorithm` | DP table visualizer (`lcs`, `knapsack`, `lis`, `fib`) |
 | `/strings/:algorithm` | String visualizer (`kmp`, `rabinkarp`, `z`, `palindrome`) |
 | `/puzzles/:algorithm` | Backtracking board visualizer (`queens`, `sudoku`, `knight`) |
-| `/race` | Sorting algorithm race mode |
+| `/pathfinding/:algorithm` | Interactive pathfinding grid (`bfs`, `dfs`, `greedy`, `astar`) |
+| `/geometry/:algorithm` | Convex hull visualizer (`graham`, `jarvis`) |
+| `/race` | Sorting algorithm race mode (supports `?algos=…&size=…&seed=…` share links) |
 
 Unknown paths fall back to `/sorting/bubble`.
 

@@ -6,6 +6,8 @@ import SegmentTreePage from './pages/SegmentTreePage';
 import DPPage from './pages/DPPage';
 import StringPage from './pages/StringPage';
 import PuzzlePage from './pages/PuzzlePage';
+import PathfindingPage from './pages/PathfindingPage';
+import GeometryPage from './pages/GeometryPage';
 import RacePage from './pages/RacePage';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
         <Route path="/dp/:algorithm" element={<DPPage />} />
         <Route path="/strings/:algorithm" element={<StringPage />} />
         <Route path="/puzzles/:algorithm" element={<PuzzlePage />} />
+        <Route path="/pathfinding/:algorithm" element={<PathfindingPage />} />
+        <Route path="/geometry/:algorithm" element={<GeometryPage />} />
         <Route path="/race" element={<RacePage />} />
         <Route path="/" element={<Navigate to="/sorting/bubble" replace />} />
         <Route path="*" element={<Navigate to="/sorting/bubble" replace />} />
