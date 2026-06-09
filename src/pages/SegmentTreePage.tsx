@@ -5,8 +5,8 @@ import Navbar from '../components/Navbar';
 import SegmentTreeVisualizer from '../components/SegmentTreeVisualizer';
 import CodePanel from '../components/CodePanel';
 import PlaybackControls from '../components/PlaybackControls';
-import { getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms/registry';
-import { getSegmentTreeAlgorithm, getDefaultSegmentTreeAlgorithm } from '../algorithms/segmentTreeRegistry';
+import { getCategoryRoute, type AlgorithmCategory } from '../algorithms/registry';
+import { getSegmentTreeAlgorithm } from '../algorithms/segmentTreeRegistry';
 import { generateRandomArray } from '../utils/array';
 import { soundEngine } from '../utils/sound';
 import { algorithmSeo } from '../utils/seo';
@@ -167,12 +167,7 @@ function SegmentTreePage() {
   }, [currentStepIndex, steps.length, currentStep, isSoundEnabled]);
 
   const handleCategoryChange = (newCategory: AlgorithmCategory) => {
-    const defaultAlgo = getDefaultAlgorithm(newCategory);
-    if (newCategory === 'sorting') navigate(`/sorting/${defaultAlgo}`);
-    else if (newCategory === 'searching') navigate(`/searching/${defaultAlgo}`);
-    else if (newCategory === 'graph') navigate(`/graph/${defaultAlgo}`);
-    else if (newCategory === 'tree') navigate(`/tree/${getDefaultSegmentTreeAlgorithm()}`);
-    else if (newCategory === 'dp') navigate(`/dp/${defaultAlgo}`);
+    navigate(getCategoryRoute(newCategory));
   };
 
   const handleAlgorithmChange = (algo: string) => {

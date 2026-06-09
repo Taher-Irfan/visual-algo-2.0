@@ -4,8 +4,8 @@ import Navbar from '../components/Navbar';
 import GraphVisualizer from '../components/GraphVisualizer';
 import CodePanel from '../components/CodePanel';
 import PlaybackControls from '../components/PlaybackControls';
-import { getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms/registry';
-import { getGraphAlgorithm, getDefaultGraphAlgorithm } from '../algorithms/graphRegistry';
+import { getCategoryRoute, type AlgorithmCategory } from '../algorithms/registry';
+import { getGraphAlgorithm } from '../algorithms/graphRegistry';
 import { generateGraph, type GraphLayoutType } from '../utils/graph';
 import { soundEngine } from '../utils/sound';
 import { algorithmSeo } from '../utils/seo';
@@ -183,21 +183,7 @@ function GraphPage() {
   }, [currentStepIndex, steps.length, currentStep.highlights]);
 
   const handleCategoryChange = (newCategory: AlgorithmCategory) => {
-    const defaultAlgo = getDefaultAlgorithm(newCategory);
-    setSelectedAlgorithm(defaultAlgo);
-    
-    if (newCategory === 'sorting') {
-      navigate(`/sorting/${defaultAlgo}`);
-    } else if (newCategory === 'searching') {
-      navigate(`/searching/${defaultAlgo}`);
-    } else if (newCategory === 'graph') {
-      const graphDefaultAlgo = getDefaultGraphAlgorithm();
-      navigate(`/graph/${graphDefaultAlgo}`);
-    } else if (newCategory === 'tree') {
-      navigate('/tree/segment');
-    } else if (newCategory === 'dp') {
-      navigate(`/dp/${defaultAlgo}`);
-    }
+    navigate(getCategoryRoute(newCategory));
   };
 
   const handleAlgorithmChange = (algorithm: string) => {

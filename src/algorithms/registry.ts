@@ -22,7 +22,7 @@ import { ternarySearch } from './ternarySearch';
 import { interpolationSearch } from './interpolationSearch';
 import { fibonacciSearch } from './fibonacciSearch';
 
-export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree' | 'dp';
+export type AlgorithmCategory = 'sorting' | 'searching' | 'graph' | 'tree' | 'dp' | 'strings' | 'puzzles' | 'race';
 
 export interface CategoryAlgorithms {
   [algorithmId: string]: Algorithm;
@@ -129,8 +129,20 @@ export function getDefaultAlgorithm(category: AlgorithmCategory): string {
     graph: 'bfs',
     tree: 'segment',
     dp: 'lcs',
+    strings: 'kmp',
+    puzzles: 'queens',
+    race: '',
   };
   return defaultMap[category] || 'bubble';
+}
+
+/**
+ * Route for a category's landing page (its default algorithm).
+ * Used by every page's category tab handler.
+ */
+export function getCategoryRoute(category: AlgorithmCategory): string {
+  if (category === 'race') return '/race';
+  return `/${category}/${getDefaultAlgorithm(category)}`;
 }
 
 /**

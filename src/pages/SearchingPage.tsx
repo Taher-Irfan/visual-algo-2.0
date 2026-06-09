@@ -5,7 +5,7 @@ import SearchingVisualizer from '../components/SearchingVisualizer';
 import ControlPanel from '../components/ControlPanel';
 import CodePanel from '../components/CodePanel';
 import PlaybackControls from '../components/PlaybackControls';
-import { algorithms, getAlgorithm, getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms';
+import { algorithms, getAlgorithm, getCategoryRoute, type AlgorithmCategory } from '../algorithms';
 import { generateRandomArray } from '../utils/array';
 import { soundEngine } from '../utils/sound';
 import { algorithmSeo } from '../utils/seo';
@@ -81,20 +81,7 @@ function SearchingPage() {
   }, [currentStepIndex, steps.length, currentStep.highlights]);
 
   const handleCategoryChange = (newCategory: AlgorithmCategory) => {
-    const defaultAlgo = getDefaultAlgorithm(newCategory);
-    setSelectedAlgorithm(defaultAlgo);
-    
-    if (newCategory === 'sorting') {
-      navigate(`/sorting/${defaultAlgo}`);
-    } else if (newCategory === 'searching') {
-      navigate(`/searching/${defaultAlgo}`);
-    } else if (newCategory === 'graph') {
-      navigate(`/graph/${defaultAlgo}`);
-    } else if (newCategory === 'tree') {
-      navigate('/tree/segment');
-    } else if (newCategory === 'dp') {
-      navigate(`/dp/${defaultAlgo}`);
-    }
+    navigate(getCategoryRoute(newCategory));
   };
 
   const handleAlgorithmChange = (algorithm: string) => {

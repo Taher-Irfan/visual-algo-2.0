@@ -5,7 +5,7 @@ import Visualizer from '../components/Visualizer';
 import ControlPanel from '../components/ControlPanel';
 import CodePanel from '../components/CodePanel';
 import PlaybackControls from '../components/PlaybackControls';
-import { algorithms, getAlgorithm, getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms';
+import { algorithms, getAlgorithm, getCategoryRoute, type AlgorithmCategory } from '../algorithms';
 import { generateRandomArray } from '../utils/array';
 import { soundEngine } from '../utils/sound';
 import { algorithmSeo } from '../utils/seo';
@@ -16,7 +16,7 @@ function SortingPage() {
   const { algorithm: algorithmParam } = useParams<{ algorithm: string }>();
   const navigate = useNavigate();
   
-  const [category, setCategory] = useState<AlgorithmCategory>('sorting');
+  const [category] = useState<AlgorithmCategory>('sorting');
   const [selectedAlgorithm, setSelectedAlgorithm] = useState(algorithmParam || 'bubble');
   const [arraySize, setArraySize] = useState(50);
   const [steps, setSteps] = useState<Step[]>([]);
@@ -81,21 +81,7 @@ function SortingPage() {
   }, [currentStepIndex, steps.length, currentStep.highlights]);
 
   const handleCategoryChange = (newCategory: AlgorithmCategory) => {
-    setCategory(newCategory);
-    const defaultAlgo = getDefaultAlgorithm(newCategory);
-    setSelectedAlgorithm(defaultAlgo);
-    
-    if (newCategory === 'sorting') {
-      navigate(`/sorting/${defaultAlgo}`);
-    } else if (newCategory === 'searching') {
-      navigate(`/searching/${defaultAlgo}`);
-    } else if (newCategory === 'graph') {
-      navigate(`/graph/${defaultAlgo}`);
-    } else if (newCategory === 'tree') {
-      navigate('/tree/segment');
-    } else if (newCategory === 'dp') {
-      navigate(`/dp/${defaultAlgo}`);
-    }
+    navigate(getCategoryRoute(newCategory));
   };
 
   const handleAlgorithmChange = (algorithm: string) => {

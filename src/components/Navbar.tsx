@@ -4,6 +4,8 @@ import { getAlgorithmOptions } from '../algorithms/registry';
 import { getGraphAlgorithmOptions } from '../algorithms/graphRegistry';
 import { getSegmentTreeAlgorithmOptions } from '../algorithms/segmentTreeRegistry';
 import { getDPAlgorithmOptions } from '../algorithms/dpRegistry';
+import { getStringAlgorithmOptions } from '../algorithms/stringRegistry';
+import { getPuzzleAlgorithmOptions } from '../algorithms/puzzleRegistry';
 
 interface NavbarProps {
   category: AlgorithmCategory;
@@ -22,6 +24,9 @@ const CATEGORIES = [
   { id: 'graph' as AlgorithmCategory, name: 'Graph' },
   { id: 'tree' as AlgorithmCategory, name: 'Tree' },
   { id: 'dp' as AlgorithmCategory, name: 'DP' },
+  { id: 'strings' as AlgorithmCategory, name: 'Strings' },
+  { id: 'puzzles' as AlgorithmCategory, name: 'Puzzles' },
+  { id: 'race' as AlgorithmCategory, name: 'Race' },
 ];
 
 export default function Navbar({
@@ -41,6 +46,12 @@ export default function Navbar({
       ? getSegmentTreeAlgorithmOptions()
       : category === 'dp'
       ? getDPAlgorithmOptions()
+      : category === 'strings'
+      ? getStringAlgorithmOptions()
+      : category === 'puzzles'
+      ? getPuzzleAlgorithmOptions()
+      : category === 'race'
+      ? []
       : getAlgorithmOptions(category);
 
   const categoryButtons = CATEGORIES.map((cat) => (
@@ -48,7 +59,7 @@ export default function Navbar({
       key={cat.id}
       onClick={() => onCategoryChange(cat.id)}
       className={`
-        px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-lg font-medium transition-all duration-200 text-sm
+        px-3 py-1.5 sm:px-4 sm:py-1.5 rounded-lg font-medium transition-all duration-200 text-sm whitespace-nowrap shrink-0
         ${
           category === cat.id
             ? 'bg-blue-500 text-white shadow-md'
@@ -76,7 +87,7 @@ export default function Navbar({
           </div>
 
           {/* Navigation Tabs — hidden on mobile, shown sm+ */}
-          <div className="hidden sm:flex items-center space-x-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+          <div className="hidden sm:flex items-center flex-wrap justify-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
             {categoryButtons}
           </div>
 
@@ -128,7 +139,7 @@ export default function Navbar({
 
         {/* Mobile-only second row: category tabs + algorithm selector */}
         <div className="sm:hidden mt-2 flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 overflow-x-auto min-w-0">
             {categoryButtons}
           </div>
           {algorithmOptions.length > 0 && (

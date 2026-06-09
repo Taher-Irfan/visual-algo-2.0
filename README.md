@@ -1,6 +1,6 @@
 # VisualAlgo
 
-Interactive, step-by-step visualizations for **sorting**, **searching**, **graph**, **tree**, and **dynamic programming** algorithms. Built with React, TypeScript, Vite, and Tailwind CSS.
+Interactive, step-by-step visualizations for **sorting**, **searching**, **graph**, **tree**, **dynamic programming**, **string**, and **backtracking** algorithms — plus a head-to-head **algorithm race mode**. Built with React, TypeScript, Vite, and Tailwind CSS.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
@@ -12,6 +12,9 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, **graph
 - **Searching** — Range and target highlighting across six search strategies
 - **Graph** — Node–edge diagrams for traversal, shortest-path, MST, and A* pathfinding
 - **Dynamic Programming** — Animated DP tables with cell dependencies and solution traceback
+- **Strings** — Pattern matching with aligned pattern rows, failure tables, and rolling hashes
+- **Puzzles** — Backtracking on chess boards and Sudoku grids with conflict and retreat animation
+- **Race Mode** — Run up to six sorting algorithms head-to-head on the same array with live standings
 - **Playback** — Continuous auto-play with speed control, or manual step mode
 - **Code panel** — Reference implementation with line highlighting synced to each step
 - **Stats** — Live comparison and swap (or operation) counts where applicable
@@ -28,6 +31,9 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, **graph
 | Graph     | BFS, DFS, Dijkstra, Prim, Kruskal, Bellman-Ford, Floyd-Warshall, A* |
 | Tree      | Segment Tree (build, query, update) |
 | DP        | Longest Common Subsequence, 0/1 Knapsack, Longest Increasing Subsequence, Fibonacci |
+| Strings   | KMP, Rabin-Karp, Z-Algorithm, Longest Palindromic Substring |
+| Puzzles   | N-Queens, Sudoku Solver, Knight's Tour |
+| Race      | Any 2–6 sorting algorithms head-to-head |
 
 ## Routes
 
@@ -41,6 +47,9 @@ The app uses React Router. Default entry redirects to Bubble Sort.
 | `/graph/:algorithm` | Graph visualizer (`bfs`, `dfs`, `dijkstra`, `prim`, `kruskal`, `bellmanford`, `floyd`, `astar`) |
 | `/tree/:algorithm` | Segment tree visualizer (`segment`) |
 | `/dp/:algorithm` | DP table visualizer (`lcs`, `knapsack`, `lis`, `fib`) |
+| `/strings/:algorithm` | String visualizer (`kmp`, `rabinkarp`, `z`, `palindrome`) |
+| `/puzzles/:algorithm` | Backtracking board visualizer (`queens`, `sudoku`, `knight`) |
+| `/race` | Sorting algorithm race mode |
 
 Unknown paths fall back to `/sorting/bubble`.
 
@@ -81,9 +90,11 @@ src/
 │   ├── registry.ts      # Sorting + searching registry
 │   ├── graphRegistry.ts # Graph algorithms (BFS, DFS, Dijkstra, Prim, Kruskal, Bellman-Ford, Floyd-Warshall, A*)
 │   ├── dpRegistry.ts    # Dynamic programming algorithms (LCS, Knapsack, LIS, Fibonacci)
+│   ├── stringRegistry.ts  # String algorithms (KMP, Rabin-Karp, Z, Palindrome)
+│   ├── puzzleRegistry.ts  # Backtracking puzzles (N-Queens, Sudoku, Knight's Tour)
 │   └── *.ts             # Per-algorithm modules
 ├── components/          # UI (Visualizer, Navbar, ControlPanel, CodePanel, …)
-├── pages/               # Route-level pages (Sorting, Searching, Graph, SegmentTree, DP)
+├── pages/               # Route-level pages (Sorting, Searching, Graph, SegmentTree, DP, Strings, Puzzles, Race)
 ├── hooks/               # e.g. playback, dark mode
 ├── types/               # Shared TypeScript types (Step, Graph, …)
 ├── utils/               # Helpers (array, graph, sound)

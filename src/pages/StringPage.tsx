@@ -2,108 +2,30 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Shuffle } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import DPVisualizer from '../components/DPVisualizer';
+import StringVisualizer from '../components/StringVisualizer';
 import CodePanel from '../components/CodePanel';
 import PlaybackControls from '../components/PlaybackControls';
 import { getCategoryRoute, type AlgorithmCategory } from '../algorithms/registry';
-import { getDPAlgorithm, getDefaultDPAlgorithm } from '../algorithms/dpRegistry';
+import { getStringAlgorithm, getDefaultStringAlgorithm } from '../algorithms/stringRegistry';
 import { soundEngine } from '../utils/sound';
 import { algorithmSeo } from '../utils/seo';
 import { useDarkMode, useSound, useSeo } from '../hooks';
-import type { DPStep } from '../types';
+import { useStepPlayback } from '../hooks/useStepPlayback';
+import type { StringStep } from '../types';
 
-const EMPTY_STEP: DPStep = {
-  table: [],
-  rowLabels: [],
-  colLabels: [],
+const EMPTY_STEP: StringStep = {
+  text: '',
   activeLine: 0,
   highlights: {},
-  operations: { cellsFilled: 0, comparisons: 0 },
+  operations: { comparisons: 0, matches: 0 },
 };
 
-function useDPPlayback() {
-  const [steps, setSteps] = useState<DPStep[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [playbackStatus, setPlaybackStatus] = useState<'idle' | 'playing' | 'paused' | 'finished'>('idle');
-  const [playbackMode, setPlaybackMode] = useState<'continuous' | 'step'>('continuous');
-  const [speed, setSpeed] = useState(1);
-
-  const currentStep = steps[currentStepIndex] ?? EMPTY_STEP;
-  const canStepForward = currentStepIndex < steps.length - 1;
-  const canStepBackward = currentStepIndex > 0;
-
-  const loadSteps = useCallback((newSteps: DPStep[]) => {
-    setSteps(newSteps);
-    setCurrentStepIndex(0);
-    setPlaybackStatus('idle');
-  }, []);
-
-  useEffect(() => {
-    if (playbackStatus !== 'playing' || playbackMode !== 'continuous') return;
-    const interval = setInterval(() => {
-      setCurrentStepIndex(prev => {
-        if (prev >= steps.length - 1) {
-          setPlaybackStatus('finished');
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 1000 / speed);
-    return () => clearInterval(interval);
-  }, [playbackStatus, playbackMode, speed, steps.length]);
-
-  const play = useCallback(() => {
-    if (currentStepIndex >= steps.length - 1) setCurrentStepIndex(0);
-    setPlaybackStatus('playing');
-  }, [currentStepIndex, steps.length]);
-
-  const pause = useCallback(() => setPlaybackStatus('paused'), []);
-
-  const stepForward = useCallback(() => {
-    if (canStepForward) {
-      setCurrentStepIndex(p => p + 1);
-      setPlaybackStatus('paused');
-    }
-  }, [canStepForward]);
-
-  const stepBackward = useCallback(() => {
-    if (canStepBackward) {
-      setCurrentStepIndex(p => p - 1);
-      setPlaybackStatus('paused');
-    }
-  }, [canStepBackward]);
-
-  const replay = useCallback(() => {
-    setCurrentStepIndex(0);
-    setPlaybackStatus('idle');
-  }, []);
-
-  return {
-    steps,
-    loadSteps,
-    currentStep,
-    currentStepIndex,
-    playbackStatus,
-    playbackMode,
-    speed,
-    canStepForward,
-    canStepBackward,
-    play,
-    pause,
-    stepForward,
-    stepBackward,
-    replay,
-    setPlaybackMode,
-    setSpeed,
-  };
-}
-
-function DPPage() {
+function StringPage() {
   const { algorithm: algorithmParam } = useParams<{ algorithm: string }>();
   const navigate = useNavigate();
 
-  const [category] = useState<AlgorithmCategory>('dp');
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState(algorithmParam || getDefaultDPAlgorithm());
+  const [category] = useState<AlgorithmCategory>('strings');
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState(algorithmParam || getDefaultStringAlgorithm());
   const [problemSize, setProblemSize] = useState(8);
   const [isDarkMode, setIsDarkMode] = useDarkMode();
   const [isSoundEnabled, setIsSoundEnabled] = useSound();
@@ -125,7 +47,7 @@ function DPPage() {
     replay,
     setPlaybackMode,
     setSpeed,
-  } = useDPPlayback();
+  } = useStepPlayback<StringStep>(EMPTY_STEP);
 
   useEffect(() => {
     if (algorithmParam && algorithmParam !== selectedAlgorithm) {
@@ -138,7 +60,7 @@ function DPPage() {
   }, []);
 
   const handleGenerateProblem = useCallback(() => {
-    const algorithm = getDPAlgorithm(selectedAlgorithm);
+    const algorithm = getStringAlgorithm(selectedAlgorithm);
     if (algorithm) {
       loadSteps(algorithm.generateSteps(problemSize));
     }
@@ -152,12 +74,12 @@ function DPPage() {
   // Sound effects driven by step highlights
   useEffect(() => {
     if (!isSoundEnabled || currentStepIndex === 0 || steps.length === 0) return;
-    if (currentStep.highlights.result?.length) {
+    if (currentStep.highlights.found?.length) {
       soundEngine.playSuccess();
-    } else if (currentStep.highlights.sources?.length) {
-      soundEngine.playCompare();
-    } else if (currentStep.highlights.current?.length) {
+    } else if (currentStep.highlights.mismatch?.length) {
       soundEngine.playVisit();
+    } else if (currentStep.highlights.compare?.length || currentStep.highlights.patternCompare?.length) {
+      soundEngine.playCompare();
     }
   }, [currentStepIndex, steps.length, currentStep.highlights, isSoundEnabled]);
 
@@ -167,12 +89,12 @@ function DPPage() {
 
   const handleAlgorithmChange = (algo: string) => {
     setSelectedAlgorithm(algo);
-    navigate(`/dp/${algo}`);
+    navigate(`/strings/${algo}`);
   };
 
-  const algorithm = getDPAlgorithm(selectedAlgorithm);
+  const algorithm = getStringAlgorithm(selectedAlgorithm);
 
-  useSeo(algorithmSeo('dp', selectedAlgorithm, algorithm?.name));
+  useSeo(algorithmSeo('strings', selectedAlgorithm, algorithm?.name));
 
   if (!algorithm) return <div>Algorithm not found</div>;
 
@@ -192,15 +114,16 @@ function DPPage() {
       />
 
       <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
-        <h1 className="sr-only">{algorithm.name} – Interactive Dynamic Programming Visualization</h1>
+        <h1 className="sr-only">{algorithm.name} – Interactive String Algorithm Visualization</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:h-[calc(100vh-140px)]">
 
           {/* Left: Visualizer + Playback */}
           <div className="lg:col-span-2 flex flex-col space-y-4 sm:space-y-6 lg:min-h-0 lg:overflow-y-auto">
-            <DPVisualizer
-              table={currentStep.table}
-              rowLabels={currentStep.rowLabels}
-              colLabels={currentStep.colLabels}
+            <StringVisualizer
+              text={currentStep.text}
+              pattern={currentStep.pattern}
+              alignOffset={currentStep.alignOffset}
+              auxTable={currentStep.auxTable}
               highlights={currentStep.highlights}
               metadata={metadata}
             />
@@ -224,15 +147,13 @@ function DPPage() {
           {/* Right: Controls + State + Code */}
           <div className="flex flex-col space-y-4 sm:space-y-6 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft p-5 sm:p-6 space-y-6">
-              {/* Controls */}
               <div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Controls</h3>
                 <div className="space-y-5">
-                  {/* Problem size */}
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
                       <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Problem Size
+                        Text Length
                       </label>
                       <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 tabular-nums">
                         {problemSize}
@@ -250,7 +171,6 @@ function DPPage() {
                     />
                   </div>
 
-                  {/* Speed */}
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
                       <label className="text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -277,7 +197,7 @@ function DPPage() {
                     className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-medium rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <Shuffle className="w-4 h-4" />
-                    <span>Generate New Problem</span>
+                    <span>Generate New Text</span>
                   </button>
                 </div>
               </div>
@@ -289,15 +209,15 @@ function DPPage() {
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Cells Filled</span>
-                    <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
-                      {operations.cellsFilled}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
                     <span className="text-xs text-slate-500 dark:text-slate-400">Comparisons</span>
                     <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
                       {operations.comparisons}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Matches</span>
+                    <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
+                      {operations.matches}
                     </span>
                   </div>
                 </div>
@@ -317,70 +237,31 @@ function DPPage() {
                       </span>
                     </div>
                     <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Cell</span>
+                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Pointers</span>
                       <span className="text-sm font-mono font-bold text-slate-900 dark:text-white">
                         {metadata?.i !== undefined && metadata?.j !== undefined
-                          ? `[${metadata.i}, ${metadata.j}]`
+                          ? `i=${metadata.i}, j=${metadata.j}`
                           : metadata?.i !== undefined
-                          ? `[${metadata.i}]`
+                          ? `i=${metadata.i}`
                           : '—'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Problem inputs */}
-                  {(metadata?.inputA || metadata?.inputArray || metadata?.weights) && (
-                    <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
-                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block mb-1.5 uppercase tracking-wide">
-                        Problem Input
+                  {currentStep.pattern && (
+                    <div className="px-3 py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <span className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wide block mb-0.5">Pattern</span>
+                      <span className="text-sm font-mono font-bold text-violet-600 dark:text-violet-400">
+                        {currentStep.pattern}
                       </span>
-                      <div className="text-xs font-mono text-slate-900 dark:text-white space-y-0.5">
-                        {metadata.inputA && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-500 dark:text-slate-400">String A</span>
-                            <span className="font-bold">{metadata.inputA}</span>
-                          </div>
-                        )}
-                        {metadata.inputB && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-500 dark:text-slate-400">String B</span>
-                            <span className="font-bold">{metadata.inputB}</span>
-                          </div>
-                        )}
-                        {metadata.inputArray && (
-                          <div className="flex justify-between gap-2">
-                            <span className="text-slate-500 dark:text-slate-400 shrink-0">Array</span>
-                            <span className="font-bold text-right">[{metadata.inputArray.join(', ')}]</span>
-                          </div>
-                        )}
-                        {metadata.weights && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-500 dark:text-slate-400">Weights</span>
-                            <span className="font-bold">[{metadata.weights.join(', ')}]</span>
-                          </div>
-                        )}
-                        {metadata.values && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-500 dark:text-slate-400">Values</span>
-                            <span className="font-bold">[{metadata.values.join(', ')}]</span>
-                          </div>
-                        )}
-                        {metadata.capacity !== undefined && (
-                          <div className="flex justify-between">
-                            <span className="text-slate-500 dark:text-slate-400">Capacity</span>
-                            <span className="font-bold">{metadata.capacity}</span>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   )}
 
-                  {/* Final result */}
-                  {metadata?.finalResult !== undefined && (
+                  {metadata?.matchPositions !== undefined && metadata.matchPositions.length > 0 && (
                     <div className="px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800">
-                      <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wide block mb-0.5">Result</span>
+                      <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wide block mb-0.5">Matches at</span>
                       <span className="text-sm font-mono font-bold text-emerald-700 dark:text-emerald-300">
-                        {metadata.finalResult}
+                        [{metadata.matchPositions.join(', ')}]
                       </span>
                     </div>
                   )}
@@ -400,4 +281,4 @@ function DPPage() {
   );
 }
 
-export default DPPage;
+export default StringPage;

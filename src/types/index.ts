@@ -195,6 +195,96 @@ export type DPAlgorithm = {
   complexity?: Complexity;
 };
 
+export type StringStep = {
+  /** The string the algorithm operates on (text, or pattern+'$'+text for Z) */
+  text: string;
+  /** Pattern being searched, rendered aligned under the text */
+  pattern?: string;
+  /** Column offset at which the pattern row is aligned under the text */
+  alignOffset?: number;
+  /** Auxiliary array rendered under the strings (LPS table, Z-array, hashes) */
+  auxTable?: {
+    label: string;
+    values: Array<number | string | null>;
+    highlight?: number[];
+  };
+  activeLine: number;
+  highlights: {
+    /** Text indices under comparison (amber) */
+    compare?: number[];
+    /** Text indices matched in the current alignment / window (blue) */
+    match?: number[];
+    /** Text indices that are part of confirmed matches (emerald) */
+    found?: number[];
+    /** Mismatch position (rose) */
+    mismatch?: number[];
+    /** Pattern indices under comparison (amber) */
+    patternCompare?: number[];
+    /** Pattern indices matched so far (blue) */
+    patternMatch?: number[];
+  };
+  metadata?: {
+    description?: string;
+    matchPositions?: number[];
+    longestPalindrome?: string;
+    i?: number;
+    j?: number;
+  };
+  operations: {
+    comparisons: number;
+    matches: number;
+  };
+};
+
+export type StringAlgorithm = {
+  id: string;
+  name: string;
+  /** size steers the randomly generated text/pattern instance */
+  generateSteps: (size: number) => StringStep[];
+  code: string;
+  complexity?: Complexity;
+};
+
+export type BoardStep = {
+  /** Cell contents: queen glyph, move number, sudoku digit, or null = empty */
+  board: Array<Array<string | number | null>>;
+  /** Marks pre-filled givens (sudoku) so they render differently */
+  fixed?: boolean[][];
+  /** Visual style: alternating chess shading or 3×3-boxed sudoku grid */
+  boardKind: 'chess' | 'sudoku';
+  activeLine: number;
+  highlights: {
+    /** Cell(s) currently being tried (violet) */
+    current?: Array<[number, number]>;
+    /** Cells causing a conflict (rose) */
+    conflict?: Array<[number, number]>;
+    /** Candidate cells under consideration (amber) */
+    candidates?: Array<[number, number]>;
+    /** Cells on the final solution (emerald) */
+    solution?: Array<[number, number]>;
+  };
+  metadata?: {
+    description?: string;
+    row?: number;
+    col?: number;
+    value?: number | string;
+    solved?: boolean;
+  };
+  operations: {
+    placements: number;
+    backtracks: number;
+  };
+};
+
+export type BoardAlgorithm = {
+  id: string;
+  name: string;
+  /** size steers the board dimensions / puzzle difficulty */
+  generateSteps: (size: number) => BoardStep[];
+  code: string;
+  complexity?: Complexity;
+};
+
 export type PlaybackMode = 'continuous' | 'step';
 
 export type PlaybackStatus = 'idle' | 'playing' | 'paused' | 'finished';

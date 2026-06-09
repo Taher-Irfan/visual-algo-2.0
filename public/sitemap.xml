@@ -46,4 +46,15 @@
   <url><loc>https://visual-algo-2-0.vercel.app/dp/knapsack</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://visual-algo-2-0.vercel.app/dp/lis</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://visual-algo-2-0.vercel.app/dp/fib</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- Strings -->
+  <url><loc>https://visual-algo-2-0.vercel.app/strings/kmp</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://visual-algo-2-0.vercel.app/strings/rabinkarp</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://visual-algo-2-0.vercel.app/strings/z</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://visual-algo-2-0.vercel.app/strings/palindrome</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- Puzzles -->
+  <url><loc>https://visual-algo-2-0.vercel.app/puzzles/queens</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://visual-algo-2-0.vercel.app/puzzles/sudoku</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://visual-algo-2-0.vercel.app/puzzles/knight</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <!-- Race -->
+  <url><loc>https://visual-algo-2-0.vercel.app/race</loc><lastmod>2026-06-09</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
 </urlset>
