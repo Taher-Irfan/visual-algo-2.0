@@ -4,10 +4,61 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VisualAlgo - Algorithm Visualization Platform</title>
+    <meta name="theme-color" content="#3b82f6" />
+
+    <!-- Primary SEO (per-route values are set dynamically by the app) -->
+    <title>VisualAlgo – Interactive Algorithm Visualizer | Sorting, Searching, Graph & DP</title>
+    <meta
+      name="description"
+      content="Learn algorithms visually with VisualAlgo: free interactive step-by-step animations of 35+ sorting, searching, graph, tree, and dynamic programming algorithms with synced code, playback controls, and complexity analysis."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://visual-algo-2-0.vercel.app/" />
+
+    <!-- Open Graph (social sharing) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="VisualAlgo" />
+    <meta property="og:title" content="VisualAlgo – Interactive Algorithm Visualizer" />
+    <meta
+      property="og:description"
+      content="Free interactive step-by-step animations of 35+ sorting, searching, graph, tree, and dynamic programming algorithms with synced code and complexity analysis."
+    />
+    <meta property="og:url" content="https://visual-algo-2-0.vercel.app/" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="VisualAlgo – Interactive Algorithm Visualizer" />
+    <meta
+      name="twitter:description"
+      content="Learn algorithms visually: step-by-step animations of sorting, searching, graph, and dynamic programming algorithms with synced code."
+    />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "VisualAlgo",
+        "url": "https://visual-algo-2-0.vercel.app/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Interactive step-by-step visualizations of sorting, searching, graph, tree, and dynamic programming algorithms with synchronized code highlighting and complexity analysis.",
+        "featureList": "Sorting visualizer, Searching visualizer, Graph algorithms, Segment tree, Dynamic programming tables, Playback controls, Code highlighting, Dark mode"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>VisualAlgo – Interactive Algorithm Visualizer</h1>
+      <p>
+        VisualAlgo offers free, interactive, step-by-step visualizations of classic computer science
+        algorithms: Bubble Sort, Quick Sort, Merge Sort, Heap Sort, Binary Search, Dijkstra, A*,
+        Kruskal, Prim, Bellman-Ford, Floyd-Warshall, Longest Common Subsequence, 0/1 Knapsack, and
+        many more. Please enable JavaScript to run the visualizer.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

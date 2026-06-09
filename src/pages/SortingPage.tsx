@@ -8,7 +8,8 @@ import PlaybackControls from '../components/PlaybackControls';
 import { algorithms, getAlgorithm, getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms';
 import { generateRandomArray } from '../utils/array';
 import { soundEngine } from '../utils/sound';
-import { usePlaybackController, useDarkMode, useSound } from '../hooks';
+import { algorithmSeo } from '../utils/seo';
+import { usePlaybackController, useDarkMode, useSound, useSeo } from '../hooks';
 import type { Step } from '../types';
 
 function SortingPage() {
@@ -103,6 +104,9 @@ function SortingPage() {
   };
 
   const algorithm = getAlgorithm(category, selectedAlgorithm) || algorithms[selectedAlgorithm];
+
+  const seo = algorithmSeo('sorting', selectedAlgorithm, algorithm?.name);
+  useSeo(seo);
 
   const stateInfo = (() => {
     const meta = currentStep.metadata;
@@ -200,6 +204,7 @@ function SortingPage() {
       />
 
       <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <h1 className="sr-only">{algorithm?.name ?? 'Sorting'} – Interactive Sorting Algorithm Visualization</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:h-[calc(100vh-140px)]">
           {/* Left Panel - Visualizer (2/3 width on large screens) */}
           <div className="lg:col-span-2 flex flex-col space-y-4 sm:space-y-6">

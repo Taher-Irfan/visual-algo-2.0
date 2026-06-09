@@ -8,7 +8,8 @@ import { getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms/regis
 import { getGraphAlgorithm, getDefaultGraphAlgorithm } from '../algorithms/graphRegistry';
 import { generateGraph, type GraphLayoutType } from '../utils/graph';
 import { soundEngine } from '../utils/sound';
-import { useDarkMode, useSound } from '../hooks';
+import { algorithmSeo } from '../utils/seo';
+import { useDarkMode, useSound, useSeo } from '../hooks';
 import type { GraphStep, Graph } from '../types';
 
 interface GraphPlaybackController {
@@ -206,6 +207,8 @@ function GraphPage() {
 
   const algorithm = getGraphAlgorithm(selectedAlgorithm);
 
+  useSeo(algorithmSeo('graph', selectedAlgorithm, algorithm?.name));
+
   if (!algorithm) {
     return <div>Algorithm not found</div>;
   }
@@ -244,6 +247,7 @@ function GraphPage() {
       />
 
       <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <h1 className="sr-only">{algorithm.name} – Interactive Graph Algorithm Visualization</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:h-[calc(100vh-140px)]">
           <div className="lg:col-span-2 flex flex-col space-y-4 sm:space-y-6 lg:min-h-0 lg:overflow-y-auto">
             <GraphVisualizer

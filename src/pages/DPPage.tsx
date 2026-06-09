@@ -8,7 +8,8 @@ import PlaybackControls from '../components/PlaybackControls';
 import { getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms/registry';
 import { getDPAlgorithm, getDefaultDPAlgorithm } from '../algorithms/dpRegistry';
 import { soundEngine } from '../utils/sound';
-import { useDarkMode, useSound } from '../hooks';
+import { algorithmSeo } from '../utils/seo';
+import { useDarkMode, useSound, useSeo } from '../hooks';
 import type { DPStep } from '../types';
 
 const EMPTY_STEP: DPStep = {
@@ -175,6 +176,9 @@ function DPPage() {
   };
 
   const algorithm = getDPAlgorithm(selectedAlgorithm);
+
+  useSeo(algorithmSeo('dp', selectedAlgorithm, algorithm?.name));
+
   if (!algorithm) return <div>Algorithm not found</div>;
 
   const { operations, metadata } = currentStep;
@@ -193,6 +197,7 @@ function DPPage() {
       />
 
       <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <h1 className="sr-only">{algorithm.name} – Interactive Dynamic Programming Visualization</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:h-[calc(100vh-140px)]">
 
           {/* Left: Visualizer + Playback */}

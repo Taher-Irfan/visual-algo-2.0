@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://visual-algo-2-0.vercel.app/sitemap.xml

@@ -122,6 +122,16 @@ Sorting and searching share the `Algorithm` + `Step` model; graph algorithms use
 2. Register it in `src/algorithms/dpRegistry.ts`.
 3. Use `/dp/your-id`.
 
+## SEO
+
+The app is search-engine friendly out of the box:
+
+- `index.html` ships default title/description, Open Graph, Twitter card, and `WebApplication` JSON-LD.
+- Each algorithm page sets a unique title, meta description, canonical URL, and `LearningResource` JSON-LD at runtime via the `useSeo` hook (`src/hooks/useSeo.ts`), driven by per-algorithm copy in `src/utils/seo.ts`.
+- `public/robots.txt` and `public/sitemap.xml` cover every route; `vercel.json` rewrites make deep links return the app with HTTP 200.
+
+**If the site moves to a custom domain**, update the URL in these four places: `src/utils/seo.ts` (`SITE_URL`), `index.html`, `public/robots.txt`, and `public/sitemap.xml`. Then submit the sitemap in [Google Search Console](https://search.google.com/search-console).
+
 ## Contributing
 
 Contributions, issues, and pull requests are welcome. Please keep changes focused and consistent with existing patterns.

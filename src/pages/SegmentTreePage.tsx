@@ -9,7 +9,8 @@ import { getDefaultAlgorithm, type AlgorithmCategory } from '../algorithms/regis
 import { getSegmentTreeAlgorithm, getDefaultSegmentTreeAlgorithm } from '../algorithms/segmentTreeRegistry';
 import { generateRandomArray } from '../utils/array';
 import { soundEngine } from '../utils/sound';
-import { useDarkMode, useSound } from '../hooks';
+import { algorithmSeo } from '../utils/seo';
+import { useDarkMode, useSound, useSeo } from '../hooks';
 import type { SegmentTreeStep } from '../types';
 
 const EMPTY_STEP: SegmentTreeStep = {
@@ -180,6 +181,9 @@ function SegmentTreePage() {
   };
 
   const algorithm = getSegmentTreeAlgorithm(selectedAlgorithm);
+
+  useSeo(algorithmSeo('tree', selectedAlgorithm, algorithm?.name));
+
   if (!algorithm) return <div>Algorithm not found</div>;
 
   const { operations, phase, metadata } = currentStep;
@@ -198,6 +202,7 @@ function SegmentTreePage() {
       />
 
       <main className="max-w-screen-2xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <h1 className="sr-only">{algorithm.name} – Interactive Tree Data Structure Visualization</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:h-[calc(100vh-140px)]">
 
           {/* Left: Visualizer + Playback */}

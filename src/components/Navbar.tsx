@@ -70,9 +70,9 @@ export default function Navbar({
             <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-sm sm:text-base">VA</span>
             </div>
-            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white tracking-tight">
+            <span className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white tracking-tight">
               VisualAlgo
-            </h1>
+            </span>
           </div>
 
           {/* Navigation Tabs — hidden on mobile, shown sm+ */}
