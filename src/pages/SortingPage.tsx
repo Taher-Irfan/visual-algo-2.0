@@ -172,6 +172,11 @@ function SortingPage() {
         if (meta.i !== undefined) items.push({ label: 'i', value: meta.i });
         if (meta.j !== undefined) items.push({ label: 'j', value: meta.j });
         break;
+      case 'bucket':
+        if (meta.i !== undefined) items.push({ label: 'idx', value: meta.i });
+        if (meta.j !== undefined) items.push({ label: 'bucket', value: meta.j });
+        if (meta.key !== undefined) items.push({ label: 'value', value: meta.key });
+        break;
     }
     return items.length > 0 ? items : undefined;
   })();

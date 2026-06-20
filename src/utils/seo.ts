@@ -39,6 +39,7 @@ const DESCRIPTIONS: Record<string, string> = {
   'sorting/cycle': 'See Cycle Sort rotate permutation cycles so every value is written at most once — the write-optimal sorting algorithm, animated step by step.',
   'sorting/pancake': 'Watch Pancake Sort order an array using only prefix flips, like flipping a stack of pancakes. Interactive step-by-step flip animation.',
   'sorting/oddeven': 'Explore Odd-Even (Brick) Sort alternating odd and even pair phases — a parallel-friendly bubble sort variant, animated step by step.',
+  'sorting/bucket': 'Watch Bucket Sort scatter values into buckets, sort each, and concatenate them back — a distribution sort running in O(n + k). Animated walkthrough.',
   // Searching
   'searching/linear': 'Watch Linear Search scan an array element by element until the target is found. Interactive step-by-step animation with comparison counting.',
   'searching/binary': 'Visualize Binary Search halving a sorted array each step to find the target in O(log n). Animated range narrowing with mid-point highlighting.',
@@ -63,11 +64,15 @@ const DESCRIPTIONS: Record<string, string> = {
   'dp/knapsack': 'Watch the 0/1 Knapsack DP weigh skip-vs-take decisions in an animated table, then trace back the chosen items. Step-by-step walkthrough.',
   'dp/lis': 'See the Longest Increasing Subsequence DP extend the best smaller predecessor at each index, then recover the subsequence. Animated table.',
   'dp/fib': 'Learn dynamic programming with bottom-up Fibonacci: each cell sums the two before it. The canonical memoization example, animated step by step.',
+  'dp/editdistance': 'Watch the Edit Distance (Levenshtein) DP fill cell by cell weighing insert, delete, and replace, then trace the cheapest edit path. Interactive animation.',
+  'dp/coinchange': 'See the Coin Change DP count the number of ways to make an amount, combining skip-coin and use-coin subproblems in an animated table.',
+  'dp/matrixchain': 'Watch Matrix Chain Multiplication fill along diagonals, trying every split point to minimize scalar multiplications. Interactive interval-DP animation.',
   // Strings
   'strings/kmp': 'Watch KMP build its LPS failure table, then scan the text without ever moving backwards. Interactive pattern matching animation with pointer tracking.',
   'strings/rabinkarp': 'See Rabin-Karp compare rolling hashes before characters — including spurious hash collisions. Animated sliding-window pattern matching.',
   'strings/z': 'Visualize the Z-Algorithm computing prefix-match lengths with its Z-box optimization, finding pattern matches in linear time. Step-by-step animation.',
   'strings/palindrome': 'Find the longest palindromic substring by expanding around every center. Interactive animation with live best-palindrome tracking.',
+  'strings/boyermoore': 'Watch Boyer-Moore scan each alignment right-to-left and jump using the bad-character rule, often skipping large chunks of text. Interactive animation.',
   // Puzzles
   'puzzles/queens': 'Watch N-Queens backtracking place queens row by row, detect attacks, and retreat from dead ends. Interactive chessboard animation up to 8×8.',
   'puzzles/sudoku': 'See a Sudoku solver try digits, hit contradictions, and backtrack on a freshly generated puzzle. Step-by-step 9×9 constraint-solving animation.',

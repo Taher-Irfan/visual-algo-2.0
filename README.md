@@ -28,12 +28,12 @@ Interactive, step-by-step visualizations for **sorting**, **searching**, **graph
 
 | Category   | Algorithms |
 |-----------|------------|
-| Sorting   | Bubble, Selection, Insertion, Quick, Merge, Heap, Shell, Cocktail Shaker, Gnome, Counting, Radix, Comb, Cycle, Pancake, Odd-Even |
+| Sorting   | Bubble, Selection, Insertion, Quick, Merge, Heap, Shell, Cocktail Shaker, Gnome, Counting, Radix, Comb, Cycle, Pancake, Odd-Even, Bucket |
 | Searching | Linear, Binary, Jump, Exponential, Ternary, Interpolation, Fibonacci |
 | Graph     | BFS, DFS, Dijkstra, Prim, Kruskal, Bellman-Ford, Floyd-Warshall, A* |
 | Tree      | Segment Tree (build, query, update) |
-| DP        | Longest Common Subsequence, 0/1 Knapsack, Longest Increasing Subsequence, Fibonacci |
-| Strings   | KMP, Rabin-Karp, Z-Algorithm, Longest Palindromic Substring |
+| DP        | Longest Common Subsequence, 0/1 Knapsack, Longest Increasing Subsequence, Fibonacci, Edit Distance, Coin Change, Matrix Chain Multiplication |
+| Strings   | KMP, Rabin-Karp, Boyer-Moore, Z-Algorithm, Longest Palindromic Substring |
 | Puzzles   | N-Queens, Sudoku Solver, Knight's Tour |
 | Pathfinding | BFS, DFS, Greedy Best-First, A* on an interactive wall/maze grid |
 | Geometry  | Graham Scan, Jarvis March (convex hull) |
@@ -46,12 +46,12 @@ The app uses React Router. Default entry redirects to Bubble Sort.
 | Path | Description |
 |------|-------------|
 | `/` | Redirects to `/sorting/bubble` |
-| `/sorting/:algorithm` | Sorting visualizer (`bubble`, `selection`, `insertion`, `quick`, `merge`, `heap`, `shell`, `cocktail`, `gnome`, `counting`, `radix`, `comb`, `cycle`, `pancake`, `oddeven`) |
+| `/sorting/:algorithm` | Sorting visualizer (`bubble`, `selection`, `insertion`, `quick`, `merge`, `heap`, `shell`, `cocktail`, `gnome`, `counting`, `radix`, `comb`, `cycle`, `pancake`, `oddeven`, `bucket`) |
 | `/searching/:algorithm` | Searching visualizer (`linear`, `binary`, `jump`, `exponential`, `ternary`, `interpolation`, `fibonacci`) |
 | `/graph/:algorithm` | Graph visualizer (`bfs`, `dfs`, `dijkstra`, `prim`, `kruskal`, `bellmanford`, `floyd`, `astar`) |
 | `/tree/:algorithm` | Segment tree visualizer (`segment`) |
-| `/dp/:algorithm` | DP table visualizer (`lcs`, `knapsack`, `lis`, `fib`) |
-| `/strings/:algorithm` | String visualizer (`kmp`, `rabinkarp`, `z`, `palindrome`) |
+| `/dp/:algorithm` | DP table visualizer (`lcs`, `knapsack`, `lis`, `fib`, `editdistance`, `coinchange`, `matrixchain`) |
+| `/strings/:algorithm` | String visualizer (`kmp`, `rabinkarp`, `boyermoore`, `z`, `palindrome`) |
 | `/puzzles/:algorithm` | Backtracking board visualizer (`queens`, `sudoku`, `knight`) |
 | `/pathfinding/:algorithm` | Interactive pathfinding grid (`bfs`, `dfs`, `greedy`, `astar`) |
 | `/geometry/:algorithm` | Convex hull visualizer (`graham`, `jarvis`) |

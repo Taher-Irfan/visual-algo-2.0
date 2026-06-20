@@ -14,6 +14,7 @@ import { combSort } from './combSort';
 import { cycleSort } from './cycleSort';
 import { pancakeSort } from './pancakeSort';
 import { oddEvenSort } from './oddEvenSort';
+import { bucketSort } from './bucketSort';
 import { linearSearch } from './linearSearch';
 import { binarySearch } from './binarySearch';
 import { jumpSearch } from './jumpSearch';
@@ -39,6 +40,7 @@ export const algorithms: Record<string, Algorithm> = {
   cycle: cycleSort,
   pancake: pancakeSort,
   oddeven: oddEvenSort,
+  bucket: bucketSort,
   linear: linearSearch,
   binary: binarySearch,
   jump: jumpSearch,

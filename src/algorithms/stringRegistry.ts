@@ -3,10 +3,12 @@ import { kmp } from './kmp';
 import { rabinKarp } from './rabinKarp';
 import { zAlgorithm } from './zAlgorithm';
 import { palindrome } from './palindrome';
+import { boyerMoore } from './boyerMoore';
 
 export const stringAlgorithmRegistry: Record<string, StringAlgorithm> = {
   kmp,
   rabinkarp: rabinKarp,
+  boyermoore: boyerMoore,
   z: zAlgorithm,
   palindrome,
 };
